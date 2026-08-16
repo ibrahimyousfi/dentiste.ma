@@ -208,30 +208,23 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Language Selector -->
-                                    <select x-model="language" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-bold rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-[#39D3C4] focus:border-[#39D3C4]">
-                                        <option value="ar-MA">Arabic (Morocco)</option>
-                                        <option value="ar-SA">Arabic (Saudi Arabia)</option>
-                                        <option value="en-US">English</option>
-                                        <option value="fr-FR">French</option>
-                                    </select>
+                                    <!-- Language Selector removed (Whisper auto-detects) -->
 
                                     <!-- Voice Dictation Button -->
                                     <button @click.prevent="toggleRecording()" type="button" 
-                                            :class="isRecording ? 'bg-red-500 hover:bg-red-600 text-white border-transparent animate-pulse shadow-red-500/30 shadow-lg' : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300'"
+                                            :disabled="isProcessing"
+                                            :class="isRecording ? 'bg-red-500 hover:bg-red-600 text-white border-transparent animate-pulse shadow-red-500/30 shadow-lg' : (isProcessing ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300')"
                                             class="inline-flex items-center px-4 py-1.5 border shadow-sm text-xs font-bold rounded-lg transition-all focus:outline-none">
-                                        <svg x-show="!isRecording" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                                        <svg x-show="isRecording" style="display: none;" class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1zm4 0a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                                        <span x-text="isRecording ? 'Listening...' : 'Start Dictation'"></span>
+                                        <svg x-show="!isRecording && !isProcessing" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                                        <svg x-show="isRecording && !isProcessing" style="display: none;" class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1zm4 0a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                                        <svg x-show="isProcessing" style="display: none;" class="animate-spin mr-1.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <span x-text="isRecording ? 'Stop Recording' : (isProcessing ? 'Processing AI...' : 'Start Dictation')"></span>
                                     </button>
                                 </div>
                             </div>
                             
                             <div class="relative">
-                                <textarea x-ref="noteTextarea" x-model="noteContent" name="note" rows="5" class="shadow-sm focus:ring-[#39D3C4] focus:border-[#39D3C4] block w-full sm:text-sm border-gray-200 rounded-xl bg-white p-4 font-medium text-gray-800 transition-colors" placeholder="Start typing or click 'Start Dictation' to speak..."></textarea>
-                                <div x-show="interimText" class="absolute bottom-4 left-4 right-4 pointer-events-none">
-                                    <span class="text-gray-400 italic font-medium" x-text="interimText"></span>
-                                </div>
+                                <textarea x-ref="noteTextarea" x-model="noteContent" name="note" rows="5" :disabled="isProcessing" class="shadow-sm focus:ring-[#39D3C4] focus:border-[#39D3C4] block w-full sm:text-sm border-gray-200 rounded-xl bg-white p-4 font-medium text-gray-800 transition-colors disabled:opacity-50" placeholder="Start typing or click 'Start Dictation' to speak..."></textarea>
                             </div>
                             
                             <div class="mt-4 flex justify-end">
@@ -644,103 +637,83 @@
             
             Alpine.data('voiceDictation', () => ({
                 noteContent: '',
-                interimText: '',
-                language: 'ar-MA', // Default to Arabic (Morocco)
                 isRecording: false,
-                recognition: null,
-
-                init() {
-                    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                        this.recognition = new SpeechRecognition();
-                        this.recognition.continuous = true;
-                        this.recognition.interimResults = true;
-
-                        const self = this;
-                        this.recognition.onresult = (event) => {
-                            console.log('Speech result event received', event);
-                            let interimTranscript = '';
-                            let finalTranscript = '';
-
-                            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                                if (event.results[i].isFinal) {
-                                    finalTranscript += event.results[i][0].transcript;
-                                    console.log('Final transcript piece:', event.results[i][0].transcript);
-                                } else {
-                                    interimTranscript += event.results[i][0].transcript;
-                                }
-                            }
-                            
-                            // Alpine reactivity sometimes needs a small push inside external event listeners
-                            if (finalTranscript) {
-                                let currentVal = self.$refs.noteTextarea ? self.$refs.noteTextarea.value : self.noteContent;
-                                let newVal = currentVal + (currentVal ? ' ' : '') + finalTranscript;
-                                
-                                self.noteContent = newVal;
-                                if (self.$refs.noteTextarea) {
-                                    self.$refs.noteTextarea.value = newVal;
-                                    self.$refs.noteTextarea.dispatchEvent(new Event('input', { bubbles: true }));
-                                }
-                                self.interimText = ''; // Clear interim
-                            } else {
-                                self.interimText = interimTranscript;
-                            }
-                        };
-
-                        this.recognition.onerror = (event) => {
-                            console.error('Speech recognition error', event.error);
-                            if (event.error === 'not-allowed') {
-                                self.isRecording = false;
-                                alert('Microphone access was denied. Please allow microphone access in your browser settings.');
-                            } else if (event.error === 'network') {
-                                self.isRecording = false;
-                                alert('Network error: The browser cannot connect to the speech recognition server. This often happens if you are offline, using a VPN, or if the browser (like Brave or Chromium) lacks access to Google\'s speech servers.');
-                            } else {
-                                self.isRecording = false;
-                            }
-                        };
-
-                        this.recognition.onend = () => {
-                            // If the user hasn't clicked "stop", try to start it again after a tiny delay
-                            if (this.isRecording) {
-                                setTimeout(() => {
-                                    try {
-                                        this.recognition.start();
-                                    } catch(e) {
-                                        console.warn("Could not restart recording automatically", e);
-                                        this.isRecording = false;
-                                    }
-                                }, 250);
-                            }
-                        };
-                    } else {
-                        console.warn('Speech recognition is not supported in this browser.');
-                    }
-                },
-
-                toggleRecording() {
-                    if (!this.recognition) {
-                        alert('Speech recognition is not supported in your browser. Please use Google Chrome.');
-                        return;
-                    }
-
+                isProcessing: false,
+                mediaRecorder: null,
+                audioChunks: [],
+                
+                async toggleRecording() {
                     if (this.isRecording) {
                         this.isRecording = false;
-                        this.recognition.stop();
+                        if (this.mediaRecorder) {
+                            this.mediaRecorder.stop();
+                        }
                     } else {
-                        this.isRecording = true;
-                        this.recognition.lang = this.language;
-                        this.noteContent = this.noteContent || ''; // Ensure it's not null
                         try {
-                            this.recognition.start();
-                        } catch(e) {
-                            console.error(e);
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            this.mediaRecorder = new MediaRecorder(stream);
+                            this.audioChunks = [];
+                            
+                            this.mediaRecorder.ondataavailable = e => {
+                                if (e.data.size > 0) this.audioChunks.push(e.data);
+                            };
+                            
+                            this.mediaRecorder.onstop = async () => {
+                                this.isProcessing = true;
+                                const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+                                
+                                const formData = new FormData();
+                                formData.append('audio', audioBlob, 'recording.webm');
+                                
+                                try {
+                                    const res = await fetch('{{ route("patients.notes.voice", $patient) }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        },
+                                        body: formData
+                                    });
+                                    const data = await res.json();
+                                    
+                                    if (data.success) {
+                                        let currentVal = this.$refs.noteTextarea ? this.$refs.noteTextarea.value : this.noteContent;
+                                        let newVal = currentVal + (currentVal ? '\n\n' : '') + data.formatted_text;
+                                        this.noteContent = newVal;
+                                        if (this.$refs.noteTextarea) {
+                                            this.$refs.noteTextarea.value = newVal;
+                                            this.$refs.noteTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+                                        }
+                                    } else {
+                                        alert(data.message || 'Error processing audio.');
+                                    }
+                                } catch (err) {
+                                    alert('Error uploading audio.');
+                                    console.error(err);
+                                }
+                                
+                                this.isProcessing = false;
+                                
+                                // Stop all tracks to release microphone
+                                stream.getTracks().forEach(track => track.stop());
+                            };
+                            
+                            this.mediaRecorder.start();
+                            this.isRecording = true;
+                        } catch (err) {
+                            alert('Microphone access denied or not available.');
+                            console.error(err);
                         }
                     }
                 },
-
+                
                 insertTemplate(text) {
-                    this.noteContent = (this.noteContent ? this.noteContent + '\n' : '') + text;
+                    let currentVal = this.$refs.noteTextarea ? this.$refs.noteTextarea.value : this.noteContent;
+                    let newVal = currentVal + (currentVal ? '\n\n' : '') + text;
+                    this.noteContent = newVal;
+                    if (this.$refs.noteTextarea) {
+                        this.$refs.noteTextarea.value = newVal;
+                        this.$refs.noteTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
                 }
             }));
         });

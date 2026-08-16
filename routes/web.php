@@ -72,6 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     Route::post('/patients/{patient}/notes', [PatientController::class, 'storeNote'])->name('patients.notes.store');
+    Route::post('/patients/{patient}/notes/voice', [\App\Http\Controllers\VoiceNoteController::class, 'transcribe'])->name('patients.notes.voice');
     Route::post('/patients/{patient}/media', [App\Http\Controllers\PatientMediaController::class, 'store'])->name('patients.media.store');
     Route::delete('/media/{media}', [App\Http\Controllers\PatientMediaController::class, 'destroy'])->name('media.destroy');
     Route::resource('patients', PatientController::class);

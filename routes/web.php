@@ -79,6 +79,7 @@ Route::middleware('auth')->group(function () {
     Route::post('patients/{patient}/set-sessions', [PatientController::class, 'setSessions'])->name('patients.set-sessions');
     Route::get('patients/{patient}/dental-chart', [DentalChartController::class, 'show'])->name('patients.dental-chart');
     Route::post('patients/{patient}/dental-chart', [DentalChartController::class, 'store'])->name('patients.dental-chart.store');
+    Route::post('patients/{patient}/dental-chart/generate-plan', [DentalChartController::class, 'generatePlan'])->name('patients.dental-chart.generate-plan');
     Route::resource('inventory', InventoryController::class);
     Route::resource('lab-cases', LabCaseController::class);
     Route::patch('treatment-plans/{treatment_plan}/status', [TreatmentPlanController::class, 'updateStatus'])->name('treatment-plans.update-status');

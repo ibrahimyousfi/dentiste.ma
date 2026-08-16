@@ -87,4 +87,52 @@ class DentalChartController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function generatePlan(Request $request, Patient $patient)
+    {
+        if ($patient->organization_id !== auth()->user()->organization_id) {
+            abort(403, 'Unauthorized access to this patient.');
+        }
+
+        // Fetch all findings with treatments
+        $findings = ToothFinding::where('patient_id', $patient->id)
+            ->whereNotNull('treatments')
+            ->get();
+
+        if ($findings->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'No treatments found in the chart to generate a plan.']);
+        }
+
+        $totalEstimatedCost = 0;
+        $notes = "Generated from Interactive Odontogram:\n\n";
+
+        foreach ($findings as $finding) {
+            $treatments = json_decode($finding->treatments, true);
+            if (is_array($treatments)) {
+                $notes .= "Tooth {$finding->tooth_number}:\n";
+                foreach ($treatments as $treatment) {
+                    $price = (float)($treatment['price'] ?? 0);
+                    $totalEstimatedCost += $price;
+                    $notes .= "- {$treatment['name']} (" . format_currency($price) . ")\n";
+                }
+                $notes .= "\n";
+            }
+        }
+
+        // Create the treatment plan
+        $plan = \App\Models\TreatmentPlan::create([
+            'organization_id' => $patient->organization_id,
+            'patient_id' => $patient->id,
+            'dentist_id' => auth()->id(),
+            'name' => 'Odontogram Plan - ' . now()->format(auth()->user()->organization->date_format ?? 'Y-m-d'),
+            'status' => 'proposed',
+            'total_estimated_cost' => $totalEstimatedCost,
+            'notes' => $notes,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'redirect_url' => route('treatment-plans.show', $plan->id)
+        ]);
+    }
 }

@@ -18,6 +18,10 @@
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
             Print A5
         </button>
+        <button type="button" @click="generatePlan()" class="print:hidden inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition shadow-sm whitespace-nowrap mr-2">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            Generate Plan
+        </button>
         <button type="button" @click="$dispatch('save-odontogram')" class="print:hidden inline-flex items-center px-4 py-2 bg-[#39D3C4] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#2db3a6] focus:outline-none focus:ring-2 focus:ring-[#39D3C4] focus:ring-offset-2 transition shadow-sm whitespace-nowrap">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
             Save Chart
@@ -613,6 +617,36 @@
                     .catch(err => {
                         this.isSaving = false;
                         alert('Error saving chart.');
+                        console.error(err);
+                    });
+                },
+
+                generatePlan() {
+                    if (this.isSaving) return;
+                    
+                    if (!confirm('This will generate a formal Treatment Plan based on the currently saved chart. Make sure you have saved the chart first. Proceed?')) return;
+                    
+                    this.isSaving = true;
+                    
+                    fetch('{{ route("patients.dental-chart.generate-plan", $patient) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.isSaving = false;
+                        if(data.success && data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            alert(data.message || 'Error generating plan.');
+                        }
+                    })
+                    .catch(err => {
+                        this.isSaving = false;
+                        alert('Error generating plan.');
                         console.error(err);
                     });
                 }

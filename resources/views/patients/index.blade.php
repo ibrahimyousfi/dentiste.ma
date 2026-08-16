@@ -137,7 +137,9 @@
                                 </x-slot>
                                 <x-slot name="content">
                                     <x-dropdown-link href="{{ route('patients.show', $patient) }}">View Profile</x-dropdown-link>
-                                    <x-dropdown-link href="{{ route('patients.edit', $patient) }}">Edit Patient</x-dropdown-link>
+                                    <button x-data @click="$dispatch('open-drawer', 'edit-patient-drawer-{{ $patient->id }}')" class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out">
+                                        Edit Patient
+                                    </button>
                                     <div class="border-t border-gray-100 my-1"></div>
                                     <x-dropdown-link href="#">Treatment Plan</x-dropdown-link>
                                     <x-dropdown-link href="#">Invoices & Payments</x-dropdown-link>
@@ -145,6 +147,47 @@
                             </x-dropdown>
                         </div>
                     </div>
+
+                    <!-- Edit Patient Drawer -->
+                    <x-ui.drawer id="edit-patient-drawer-{{ $patient->id }}" title="Edit Patient">
+                        <form id="edit-patient-form-{{ $patient->id }}" action="{{ route('patients.update', $patient) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                                        <input type="text" name="first_name" value="{{ $patient->first_name }}" required class="w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                                        <input type="text" name="last_name" value="{{ $patient->last_name }}" required class="w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                                        <input type="text" name="phone" value="{{ $patient->phone }}" required class="w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                        <input type="email" name="email" value="{{ $patient->email }}" class="w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">National ID</label>
+                                    <input type="text" name="national_id" value="{{ $patient->national_id }}" class="w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                                </div>
+                            </div>
+                        </form>
+
+                        <x-slot name="footer">
+                            <x-ui.button variant="secondary" x-on:click="show = false">Cancel</x-ui.button>
+                            <x-ui.button variant="primary" x-on:click="document.getElementById('edit-patient-form-{{ $patient->id }}').submit()">Save Changes</x-ui.button>
+                        </x-slot>
+                    </x-ui.drawer>
                 @endforeach
             </div>
             

@@ -97,8 +97,9 @@
                                     @if($patient->total_sessions > 0 && $patient->completed_sessions < $patient->total_sessions)
                                         <form action="{{ route('patients.increment-session', $patient) }}" method="POST" class="inline">
                                             @csrf
-                                            <button type="submit" class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-500 hover:bg-[#39D3C4] hover:text-white transition-colors" title="Increment Session">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                                            <button type="submit" class="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#39D3C4]/10 text-[#39D3C4] border border-[#39D3C4]/20 hover:bg-[#39D3C4] hover:text-white transition-colors shadow-sm" title="Mark session as completed">
+                                                <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                                                Add
                                             </button>
                                         </form>
                                     @endif

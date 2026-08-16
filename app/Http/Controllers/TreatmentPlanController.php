@@ -18,6 +18,7 @@ class TreatmentPlanController extends Controller
         
         $plans = TreatmentPlan::with(['patient', 'dentist'])
                     ->withCount('sessions')
+                    ->withSum('invoices as amount_paid', 'paid_amount')
                     ->where('organization_id', $org_id)
                     ->orderBy('created_at', 'desc')
                     ->paginate(15);
@@ -78,32 +79,109 @@ class TreatmentPlanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(TreatmentPlan $treatmentPlan)
     {
-        //
+        $org_id = auth()->user()->organization_id ?? 1;
+        if ($treatmentPlan->organization_id !== $org_id) {
+            abort(403);
+        }
+        
+        $treatmentPlan->load(['patient', 'dentist', 'sessions']);
+        
+        // Calculate amount paid by summing up payments associated with this treatment plan
+        // Assuming we have a way to track payments per plan, or we pass it
+        // Since we are mocking/building the financial side, we'll pass the plan directly
+        return view('treatments.show', compact('treatmentPlan'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(TreatmentPlan $treatmentPlan)
     {
-        //
+        // Handled via drawer in index, but if accessed directly:
+        return redirect()->route('treatment-plans.index');
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, TreatmentPlan $treatmentPlan)
     {
-        //
+        $org_id = auth()->user()->organization_id ?? 1;
+        if ($treatmentPlan->organization_id !== $org_id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'total_estimated_cost' => 'required|numeric|min:0',
+            'notes' => 'nullable|string',
+        ]);
+
+        $treatmentPlan->update($validated);
+
+        return redirect()->back()->with('success', 'Treatment plan updated successfully.');
+    }
+
+    /**
+     * Update the status of the treatment plan.
+     */
+    public function updateStatus(Request $request, TreatmentPlan $treatmentPlan)
+    {
+        $org_id = auth()->user()->organization_id ?? 1;
+        if ($treatmentPlan->organization_id !== $org_id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:proposed,accepted,completed,rejected',
+        ]);
+
+        $treatmentPlan->update(['status' => $validated['status']]);
+
+        return redirect()->back()->with('success', 'Treatment plan status updated to ' . $validated['status'] . '.');
+    }
+
+    /**
+     * Store a new session for the treatment plan.
+     */
+    public function storeSession(Request $request, TreatmentPlan $treatmentPlan)
+    {
+        $org_id = auth()->user()->organization_id ?? 1;
+        if ($treatmentPlan->organization_id !== $org_id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'session_date' => 'required|date',
+            'clinical_notes' => 'nullable|string',
+        ]);
+
+        $treatmentPlan->sessions()->create([
+            'organization_id' => $org_id,
+            'patient_id' => $treatmentPlan->patient_id,
+            'dentist_id' => $treatmentPlan->dentist_id,
+            'session_date' => $validated['session_date'],
+            'clinical_notes' => $validated['clinical_notes'],
+            'status' => 'completed',
+        ]);
+
+        return redirect()->back()->with('success', 'Treatment session added successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(TreatmentPlan $treatmentPlan)
     {
-        //
+        $org_id = auth()->user()->organization_id ?? 1;
+        if ($treatmentPlan->organization_id !== $org_id) {
+            abort(403);
+        }
+
+        $treatmentPlan->delete();
+
+        return redirect()->route('treatment-plans.index')->with('success', 'Treatment plan deleted successfully.');
     }
 }

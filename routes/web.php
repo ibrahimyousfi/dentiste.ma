@@ -81,6 +81,8 @@ Route::middleware('auth')->group(function () {
     Route::post('patients/{patient}/dental-chart', [DentalChartController::class, 'store'])->name('patients.dental-chart.store');
     Route::resource('inventory', InventoryController::class);
     Route::resource('lab-cases', LabCaseController::class);
+    Route::patch('treatment-plans/{treatment_plan}/status', [TreatmentPlanController::class, 'updateStatus'])->name('treatment-plans.update-status');
+    Route::post('treatment-plans/{treatment_plan}/sessions', [TreatmentPlanController::class, 'storeSession'])->name('treatment-plans.sessions.store');
     Route::resource('treatment-plans', TreatmentPlanController::class);
     Route::resource('prescriptions', PrescriptionController::class);
     

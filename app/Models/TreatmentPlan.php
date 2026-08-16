@@ -22,4 +22,14 @@ class TreatmentPlan extends Model
     {
         return $this->hasMany(TreatmentSession::class);
     }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function getAmountPaidAttribute()
+    {
+        return $this->invoices()->sum('paid_amount');
+    }
 }

@@ -21,6 +21,7 @@ class PaymentController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'payment_method' => 'required|string|in:cash,credit_card,bank_transfer,insurance',
             'notes' => 'nullable|string',
+            'treatment_plan_id' => 'nullable|exists:treatment_plans,id',
         ]);
 
         $patient = Patient::findOrFail($request->patient_id);
@@ -30,6 +31,7 @@ class PaymentController extends Controller
         $invoice = Invoice::create([
             'organization_id' => $organizationId,
             'patient_id' => $patient->id,
+            'treatment_plan_id' => $request->treatment_plan_id,
             'invoice_number' => 'INV-' . strtoupper(uniqid()),
             'total_amount' => $request->amount,
             'paid_amount' => $request->amount,

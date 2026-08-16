@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription - {{ $prescription->patient->first_name }} {{ $prescription->patient->last_name }}</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+    <!-- Scripts -->
+    @vite(['resources/css/app.css'])
+    <style>
+        @media print {
+            body { background-color: white !important; }
+            .no-print { display: none !important; }
+            .print-area { box-shadow: none !important; margin: 0 !important; padding: 0 !important; max-width: 100% !important; }
+        }
+        .rx-symbol {
+            font-family: serif;
+            font-size: 3rem;
+            line-height: 1;
+            font-weight: bold;
+            color: #374151;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen py-8 text-gray-900 font-sans">
+    
+    <div class="max-w-4xl mx-auto mb-6 text-right no-print px-4">
+        <a href="{{ route('prescriptions.index') }}" class="text-sm text-gray-500 hover:text-gray-900 mr-4">Back to Archive</a>
+        <button onclick="window.print()" class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-md">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Print Prescription
+        </button>
+    </div>
+
+    <!-- Print Area -->
+    <div class="max-w-3xl mx-auto bg-white p-12 shadow-xl print-area rounded-lg">
+        
+        <!-- Header / Letterhead -->
+        <div class="flex justify-between items-start border-b-2 border-purple-800 pb-6 mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-purple-900 tracking-tight">Dental Clinic SaaS</h1>
+                <p class="text-sm text-gray-600 mt-1 font-medium">Dr. {{ $prescription->dentist->name }}</p>
+                <p class="text-xs text-gray-500">Dental Surgeon & Specialist</p>
+            </div>
+            <div class="text-right text-sm text-gray-600">
+                <p>123 Medical Hub, City Center</p>
+                <p>Phone: (555) 123-4567</p>
+                <p>Email: clinic@dentalsaas.com</p>
+            </div>
+        </div>
+
+        <!-- Patient Info -->
+        <div class="flex justify-between items-end mb-12">
+            <div class="flex-1">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Patient Information</p>
+                <p class="text-lg font-bold text-gray-900">{{ $prescription->patient->first_name }} {{ $prescription->patient->last_name }}</p>
+                <p class="text-sm text-gray-600">DOB: {{ $prescription->patient->date_of_birth ? \Carbon\Carbon::parse($prescription->patient->date_of_birth)->format('M d, Y') : 'N/A' }}</p>
+                @if($prescription->patient->address)
+                    <p class="text-sm text-gray-600">{{ $prescription->patient->address }}</p>
+                @endif
+            </div>
+            <div class="text-right">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Date</p>
+                <p class="text-lg font-bold text-gray-900">{{ \Carbon\Carbon::parse($prescription->date)->format('F j, Y') }}</p>
+            </div>
+        </div>
+
+        <!-- Rx Body -->
+        <div class="min-h-[400px]">
+            <div class="flex items-start mb-6">
+                <span class="rx-symbol mr-4 text-purple-900">Rx</span>
+                <div class="flex-1 pt-3">
+                    <div class="prose prose-purple max-w-none text-gray-800 text-lg whitespace-pre-wrap leading-relaxed">
+                        {{ $prescription->medications }}
+                    </div>
+                </div>
+            </div>
+
+            @if($prescription->notes)
+            <div class="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                <p class="text-sm font-bold text-gray-700 mb-1">Additional Instructions:</p>
+                <p class="text-sm text-gray-600 whitespace-pre-wrap">{{ $prescription->notes }}</p>
+            </div>
+            @endif
+        </div>
+
+        <!-- Footer / Signature -->
+        <div class="mt-16 pt-8 flex justify-between items-end">
+            <div class="text-xs text-gray-400">
+                <p>Prescription ID: #{{ str_pad($prescription->id, 6, '0', STR_PAD_LEFT) }}</p>
+                <p>Generated by Dental Clinic SaaS</p>
+            </div>
+            <div class="text-center">
+                <div class="border-b border-gray-400 w-64 mb-2 pb-8">
+                    <!-- Space for physical signature -->
+                </div>
+                <p class="text-sm font-bold text-gray-800">Dr. {{ $prescription->dentist->name }}</p>
+                <p class="text-xs text-gray-500">Signature</p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

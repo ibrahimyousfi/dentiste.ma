@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ sidebarOpen: window.innerWidth >= 1024 }">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="WQkKJcWAvV81opqJhyoYzoWBUtRu9P4c2MV6eggq">
+
+        <title>Laravel</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+
+        <!-- Scripts -->
+        <script type="module" src="http://[::1]:5173/@vite/client"></script><link rel="stylesheet" href="http://[::1]:5173/resources/css/app.css" /><script type="module" src="http://[::1]:5173/resources/js/app.js"></script>        
+        <style>
+            /* Simple Dental Color Variables */
+            :root {
+                --color-primary: #39D3C4; /* Bright Teal/Cyan */
+                --color-primary-hover: #2db3a6;
+                --color-dark: #374151; /* Dark Gray */
+                --color-bg: #F9FAFB; /* Light Gray Background */
+                --color-card: #FFFFFF; /* Pure White */
+            }
+            .text-primary { color: var(--color-primary); }
+            .bg-primary { background-color: var(--color-primary); }
+            .border-primary { border-color: var(--color-primary); }
+            .hover\:bg-primary-hover:hover { background-color: var(--color-primary-hover); }
+        </style>
+    </head>
+    <body class="font-sans antialiased text-gray-800 bg-[#F9FAFB]">
+        <div class="flex h-screen overflow-hidden bg-[#F9FAFB] selection:bg-[#39D3C4] selection:text-white">
+            
+            <!-- Sidebar Navigation -->
+            <!-- Sidebar Navigation -->
+<aside 
+    class="bg-white border-r border-gray-200 text-gray-700 flex flex-col transition-all duration-300 ease-in-out z-40 relative shadow-sm"
+    :class="sidebarOpen ? 'w-64' : 'w-20'"
+>
+    <!-- Logo Area -->
+    <div class="h-16 flex items-center justify-center border-b border-black/5 shrink-0">
+        
+        <!-- Expanded Logo -->
+        <div x-show="sidebarOpen" class="flex items-center justify-center w-full px-4 h-full py-2">
+                            <div class="w-12 h-12 rounded-lg bg-[#39D3C4] flex items-center justify-center text-white font-bold text-2xl">
+                    P
+                </div>
+                    </div>
+        
+        <!-- Collapsed Logo -->
+        <div x-show="!sidebarOpen" class="flex items-center justify-center w-full h-full py-2">
+                            <div class="w-10 h-10 rounded-lg bg-[#39D3C4] flex items-center justify-center text-white font-bold text-xl">
+                    P
+                </div>
+                    </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="flex-1 overflow-y-auto py-4 overflow-x-hidden">
+        <nav class="space-y-1 px-2">
+            
+            <!-- Dashboard -->
+            <a href="http://localhost:8000/dashboard" 
+               class="flex items-center px-3 py-3 rounded-xl transition-colors text-gray-600 hover:bg-gray-50 hover:text-[#39D3C4]"
+               title="Dashboard">
+                <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Dashboard</span>
+            </a>
+
+                        
+                <div x-show="sidebarOpen" class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Clinical</div>
+
+            <!-- Patients -->
+            <a href="http://localhost:8000/patients" 
+               class="flex items-center px-3 py-3 rounded-xl transition-colors text-gray-600 hover:bg-gray-50 hover:text-[#39D3C4]"
+               title="Patients Database">
+                <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Patients</span>
+            </a>
+
+            
+            <div x-show="sidebarOpen" class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Operations</div>
+
+            <!-- Appointments -->
+            <a href="http://localhost:8000/appointments" 
+               class="flex items-center px-3 py-3 rounded-xl transition-colors text-gray-600 hover:bg-gray-50 hover:text-[#39D3C4]"
+               title="Appointments Calendar">
+                <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Appointments</span>
+            </a>
+
+                        
+            <div x-show="sidebarOpen" class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Finance</div>
+
+            <!-- Invoices & Billing -->
+            <a href="http://localhost:8000/invoices" 
+               class="flex items-center px-3 py-3 rounded-xl transition-colors text-gray-600 hover:bg-gray-50 hover:text-[#39D3C4]"
+               title="Invoices & Billing">
+                <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Invoices</span>
+            </a>
+
+                    </nav>
+    </div>
+
+    <!-- Bottom Settings / Logout -->
+    <div class="p-4 border-t border-gray-200">
+        <a href="http://localhost:8000/profile" 
+           class="flex items-center px-3 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+           title="Settings">
+            <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Settings</span>
+        </a>
+    </div>
+</aside>
+
+            <!-- Main Content Wrapper -->
+            <div class="flex flex-col flex-1 w-full h-full overflow-hidden">
+                
+                <!-- Topbar -->
+                <header class="bg-white border-b border-gray-200 sticky top-0 z-30 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+                    <!-- Left Side (Toggle + Title) -->
+                    <div class="flex items-center">
+                        <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 hover:text-[#39D3C4] focus:outline-none focus:ring-2 focus:ring-[#39D3C4] rounded-lg p-2 transition-colors mr-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
+                                                    <div class="hidden md:flex items-center">
+                                <h2 class="font-bold text-xl text-gray-800 leading-tight tracking-tight flex items-center">
+            <span class="bg-[#39D3C4]/10 text-[#39D3C4] p-2 rounded-lg mr-3 shadow-sm">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </span>
+            <a href="http://localhost:8000/patients/2" class="hover:text-[#39D3C4] transition">Mustapha Talha</a>
+            <span class="mx-2 text-gray-400">/</span>
+            Interactive Odontogram
+        </h2>
+                            </div>
+                                            </div>
+
+                    <!-- Right Side (Actions + Profile) -->
+                    <div class="flex items-center space-x-4">
+                                                    <div class="hidden lg:flex items-center">
+                                <div class="text-sm text-gray-500 font-medium mr-4 print:hidden">
+            File #PT-00002
+        </div>
+        <button type="button" onclick="window.dispatchEvent(new CustomEvent('print-chart'))" class="print:hidden inline-flex items-center px-4 py-2 bg-gray-100 border border-transparent rounded-lg font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition shadow-sm whitespace-nowrap mr-2">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Print A5
+        </button>
+        <button type="button" @click="$dispatch('save-odontogram')" class="print:hidden inline-flex items-center px-4 py-2 bg-[#39D3C4] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#2db3a6] focus:outline-none focus:ring-2 focus:ring-[#39D3C4] focus:ring-offset-2 transition shadow-sm whitespace-nowrap">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+            Save Chart
+        </button>
+                            </div>
+                        
+                        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @close.stop="open = false">
+    <div @click="open = ! open">
+        <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition ease-in-out duration-150 border-l border-gray-200 pl-4 ml-2">
+                                    <div class="h-8 w-8 rounded-full bg-[#39D3C4]/10 text-[#39D3C4] flex items-center justify-center font-bold mr-2">
+                                        T
+                                    </div>
+                                    <div class="hidden sm:block">Test User</div>
+                                    <div class="ml-1 hidden sm:block">
+                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </button>
+    </div>
+
+    <div x-show="open"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="absolute z-50 mt-2 w-48 rounded-md shadow-lg ltr:origin-top-right rtl:origin-top-left end-0"
+            style="display: none;"
+            @click="open = false">
+        <div class="rounded-md ring-1 ring-black ring-opacity-5 py-1 bg-white dark:bg-gray-700">
+            <a class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out" href="http://localhost:8000/profile">Profile</a>
+
+                                <!-- Authentication -->
+                                <form method="POST" action="http://localhost:8000/logout">
+                                    <input type="hidden" name="_token" value="WQkKJcWAvV81opqJhyoYzoWBUtRu9P4c2MV6eggq" autocomplete="off">                                    <a class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out" href="http://localhost:8000/logout" onclick="event.preventDefault();
+                                                        this.closest('form').submit();">Log Out</a>
+                                </form>
+        </div>
+    </div>
+</div>
+                    </div>
+                </header>
+
+                <!-- Scrollable Content Area -->
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-[#F9FAFB] p-6">
+                    <div class="w-full max-w-7xl mx-auto">
+                        <!-- Mobile Actions (shown only on small screens) -->
+                                                    <div class="lg:hidden mb-6 flex flex-col sm:flex-row gap-4">
+                                <div class="text-sm text-gray-500 font-medium mr-4 print:hidden">
+            File #PT-00002
+        </div>
+        <button type="button" onclick="window.dispatchEvent(new CustomEvent('print-chart'))" class="print:hidden inline-flex items-center px-4 py-2 bg-gray-100 border border-transparent rounded-lg font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition shadow-sm whitespace-nowrap mr-2">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Print A5
+        </button>
+        <button type="button" @click="$dispatch('save-odontogram')" class="print:hidden inline-flex items-center px-4 py-2 bg-[#39D3C4] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#2db3a6] focus:outline-none focus:ring-2 focus:ring-[#39D3C4] focus:ring-offset-2 transition shadow-sm whitespace-nowrap">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+            Save Chart
+        </button>
+                            </div>
+                                                
+                        <style>
+        /* Only keep standard print table styles for the screen-rendered DOM, 
+           the actual print styles will be injected into the popup */
+        @media print {
+            .print\:hidden {
+                display: none !important;
+            }
+            #print-area {
+                display: flex !important;
+                visibility: visible !important;
+                width: 100% !important;
+            }
+        }
+    </style>
+
+    <div class="animate-fade-in" x-data="odontogram()" @print-chart.window="printChart()" @save-odontogram.window="saveChart()">
+        
+        <!-- ========================================== -->
+        <!--                  SCREEN VIEW                 -->
+        <!-- ========================================== -->
+        <div class="print:hidden">
+            <div class="max-w-5xl mx-auto space-y-8 relative pb-24">
+                
+                <!-- Main Content Area -->
+                <div class="space-y-8">
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
+                    
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                            <h3 class="text-xl font-bold text-gray-900">Dental Odontogram</h3>
+                            <div class="flex flex-wrap gap-4 text-xs font-semibold text-gray-500">
+                                <span class="flex items-center"><span class="w-3 h-3 rounded bg-[#ef4444] mr-1.5"></span> Caries</span>
+                                <span class="flex items-center"><span class="w-3 h-3 rounded bg-[#3b82f6] mr-1.5"></span> Filling</span>
+                                <span class="flex items-center"><span class="w-3 h-3 rounded bg-[#eab308] mr-1.5"></span> Crown</span>
+                                <span class="flex items-center"><span class="w-3 h-3 rounded border-2 border-[#6b7280] mr-1.5"></span> Extracted</span>
+                            </div>
+                        </div>
+
+                        <div class="w-full" x-show="!isChild">
+                            <!-- Adult Maxillary (Upper) -->
+                            <div class="mb-2 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Upper Arch (Maxillary)</div>
+                            <div class="flex justify-center gap-1 mb-8 pb-32">
+                                <!-- Q1: 18 to 11 -->
+                                <div class="flex gap-1 border-r-2 border-gray-100 pr-2">
+                                    <template x-for="tooth in [18,17,16,15,14,13,12,11]" :key="tooth">
+                                        <div class="flex flex-col items-center group cursor-pointer transition-transform duration-300" :style="getArchStyle(tooth)">
+                                            <span class="text-xs font-bold text-gray-400 mb-1" x-text="tooth"></span>
+                                            <div class="w-8 h-8 sm:w-11 sm:h-11 relative drop-shadow-sm hover:scale-110 transition-transform">
+                                                <div x-html="renderToothInteractive(tooth)"></div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                                <!-- Q2: 21 to 28 -->
+                                <div class="flex gap-1 pl-2">
+                                    <template x-for="tooth in [21,22,23,24,25,26,27,28]" :key="tooth">
+                                        <div class="flex flex-col items-center group cursor-pointer transition-transform duration-300" :style="getArchStyle(tooth)">
+                                            <span class="text-xs font-bold text-gray-400 mb-1" x-text="tooth"></span>
+                                            <div class="w-8 h-8 sm:w-11 sm:h-11 relative drop-shadow-sm hover:scale-110 transition-transform">
+                                                <div x-html="renderToothInteractive(tooth)"></div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Adult Mandibular (Lower) -->
+                            <div class="mb-2 text-center text-xs font-bold text-gray-400 uppercase tracking-widest mt-16">Lower Arch (Mandibular)</div>
+                            <div class="flex justify-center gap-1 mb-8 pt-32">
+                                <!-- Q4: 48 to 41 -->
+                                <div class="flex gap-1 border-r-2 border-gray-100 pr-2">
+                                    <template x-for="tooth in [48,47,46,45,44,43,42,41]" :key="tooth">
+                                        <div class="flex flex-col items-center group cursor-pointer transition-transform duration-300" :style="getArchStyle(tooth)">
+                                            <div class="w-8 h-8 sm:w-11 sm:h-11 relative drop-shadow-sm hover:scale-110 transition-transform">
+                                                <div x-html="renderToothInteractive(tooth)"></div>
+                                            </div>
+                                            <span class="text-xs font-bold text-gray-400 mt-1" x-text="tooth"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                                <!-- Q3: 31 to 38 -->
+                                <div class="flex gap-1 pl-2">
+                                    <template x-for="tooth in [31,32,33,34,35,36,37,38]" :key="tooth">
+                                        <div class="flex flex-col items-center group cursor-pointer transition-transform duration-300" :style="getArchStyle(tooth)">
+                                            <div class="w-8 h-8 sm:w-11 sm:h-11 relative drop-shadow-sm hover:scale-110 transition-transform">
+                                                <div x-html="renderToothInteractive(tooth)"></div>
+                                            </div>
+                                            <span class="text-xs font-bold text-gray-400 mt-1" x-text="tooth"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div> <!-- End Adult Chart -->
+
+                        <div class="w-full" x-show="isChild">
+                            <h3 class="text-xl font-bold text-gray-900 mb-8">Pediatric Chart (Child)</h3>
+
+                            <!-- Child Maxillary -->
+                            <div class="flex justify-center gap-1 mb-8 pb-20">
+                                <!-- Q1: 55 to 51 -->
+                                <div class="flex gap-1 border-r-2 border-gray-100 pr-2">
+                                    <template x-for="tooth in [55,54,53,52,51]" :key="tooth">
+                                        <div class="flex flex-col items-center group cursor-pointer transition-transform duration-300" :style="getArchStyle(tooth)">
+                                            <span class="text-xs font-bold text-gray-400 mb-1" x-text="tooth"></span>
+                                            <div class="w-8 h-8 sm:w-10 sm:h-10 relative drop-shadow-sm hover:scale-110 transition-transform">
+                                                <div x-html="renderToothInteractive(tooth)"></div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                                <!-- Q2: 61 to 65 -->
+                                <div class="flex gap-1 pl-2">
+                                    <template x-for="tooth in [61,62,63,64,65]" :key="tooth">
+                                        <div class="flex flex-col items-center group cursor-pointer transition-transform duration-300" :style="getArchStyle(tooth)">
+                                            <span class="text-xs font-bold text-gray-400 mb-1" x-text="tooth"></span>
+                                            <div class="w-8 h-8 sm:w-10 sm:h-10 relative drop-shadow-sm hover:scale-110 transition-transform">
+                                                <div x-html="renderToothInteractive(tooth)"></div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Child Mandibular -->
+                            <div class="flex justify-center gap-1 pt-20">
+                                <!-- Q4: 85 to 81 -->
+                                <div class="flex gap-1 border-r-2 border-gray-100 pr-2">
+                                    <template x-for="tooth in [85,84,83,82,81]" :key="tooth">
+                                        <div class="flex flex-col items-center group cursor-pointer transition-transform duration-300" :style="getArchStyle(tooth)">
+                                            <div class="w-8 h-8 sm:w-10 sm:h-10 relative drop-shadow-sm hover:scale-110 transition-transform">
+                                                <div x-html="renderToothInteractive(tooth)"></div>
+                                            </div>
+                                            <span class="text-xs font-bold text-gray-400 mt-1" x-text="tooth"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                                <!-- Q3: 71 to 75 -->
+                                <div class="flex gap-1 pl-2">
+                                    <template x-for="tooth in [71,72,73,74,75]" :key="tooth">
+                                        <div class="flex flex-col items-center group cursor-pointer transition-transform duration-300" :style="getArchStyle(tooth)">
+                                            <div class="w-8 h-8 sm:w-10 sm:h-10 relative drop-shadow-sm hover:scale-110 transition-transform">
+                                                <div x-html="renderToothInteractive(tooth)"></div>
+                                            </div>
+                                            <span class="text-xs font-bold text-gray-400 mt-1" x-text="tooth"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Treatment Estimate Table -->
+                <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                        <svg class="w-6 h-6 text-[#39D3C4] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Financial Records & Operations
+                    </h3>
+                    
+                    <div class="overflow-x-auto border border-gray-100 rounded-xl">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-3 py-2 text-left font-bold text-gray-500 uppercase tracking-wider">Dates</th>
+                                    <th scope="col" class="px-3 py-2 text-left font-bold text-gray-500 uppercase tracking-wider">Natures des Opérations</th>
+                                    <th scope="col" class="px-3 py-2 text-right font-bold text-gray-500 uppercase tracking-wider">Prix Convenu</th>
+                                    <th scope="col" class="px-3 py-2 text-right font-bold text-gray-500 uppercase tracking-wider">Reçu</th>
+                                    <th scope="col" class="px-3 py-2 text-right font-bold text-gray-500 uppercase tracking-wider">A Recevoir</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-100">
+                                <template x-for="tooth in Object.keys(chartData)" :key="tooth">
+                                    <tr x-show="isToothAffected(tooth)" class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-3 py-2 whitespace-nowrap text-gray-600">
+                                            11/08/26
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-gray-900 font-medium">
+                                            <span x-text="tooth + ' : ' + getTreatmentDescription(tooth)"></span>
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-right">
+                                            <div class="flex items-center justify-end">
+                                                <input type="number" min="0" step="50" x-model.number="chartData[tooth].price" class="w-20 text-right rounded border-gray-300 focus:border-[#39D3C4] focus:ring-[#39D3C4] sm:text-xs py-1 px-2">
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-right">
+                                            <div class="flex items-center justify-end">
+                                                <input type="number" min="0" step="50" x-model.number="chartData[tooth].received" class="w-20 text-right rounded border-gray-300 focus:border-[#39D3C4] focus:ring-[#39D3C4] sm:text-xs py-1 px-2">
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-right font-bold text-[#39D3C4]" x-text="formatPrice( (chartData[tooth].price || 0) - (chartData[tooth].received || 0) )">
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                            <tfoot class="bg-gray-50 font-bold border-t-2 border-gray-200">
+                                <tr>
+                                    <td colspan="2" class="px-3 py-3 text-center text-gray-900 uppercase tracking-wider">A Reporter</td>
+                                    <td class="px-3 py-3 text-right text-gray-900" x-text="formatPrice(calculateTotal())"></td>
+                                    <td class="px-3 py-3 text-right text-gray-900" x-text="formatPrice(calculateReceived())"></td>
+                                    <td class="px-3 py-3 text-right text-xl text-[#39D3C4]" x-text="formatPrice(calculateTotal() - calculateReceived())"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+            <!-- Floating Clinical Tools (Draggable) -->
+            <div id="clinical-tools" class="fixed top-24 right-8 bg-white/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-gray-100 z-40 w-72 cursor-move hidden lg:block" style="touch-action: none;">
+                <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3 cursor-move">
+                    <h4 class="text-sm font-black text-gray-900 flex items-center tracking-wide uppercase">
+                        <svg class="w-5 h-5 mr-2 text-[#39D3C4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                        Magic Tool
+                    </h4>
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
+                </div>
+                
+                <div class="space-y-2 mb-4">
+                    <button @click="activeTool = 'eraser'" :class="activeTool === 'eraser' ? 'bg-gray-100 ring-2 ring-gray-400 font-bold' : 'hover:bg-gray-50'" class="w-full flex items-center p-2.5 rounded-xl text-sm text-gray-700 transition-all font-medium">
+                        <span class="w-6 h-6 rounded bg-white border border-gray-200 flex items-center justify-center mr-3 text-xs shadow-sm">🧹</span> Eraser / Healthy
+                    </button>
+                    <button @click="activeTool = 'decayed'" :class="activeTool === 'decayed' ? 'bg-red-50 ring-2 ring-red-400 font-bold text-red-700' : 'hover:bg-red-50'" class="w-full flex items-center p-2.5 rounded-xl text-sm text-gray-700 transition-all font-medium">
+                        <span class="w-6 h-6 rounded bg-[#ef4444] mr-3 shadow-sm"></span> Caries (Decay)
+                    </button>
+                    <button @click="activeTool = 'filled'" :class="activeTool === 'filled' ? 'bg-blue-50 ring-2 ring-blue-400 font-bold text-blue-700' : 'hover:bg-blue-50'" class="w-full flex items-center p-2.5 rounded-xl text-sm text-gray-700 transition-all font-medium">
+                        <span class="w-6 h-6 rounded bg-[#3b82f6] mr-3 shadow-sm"></span> Filling (Resin)
+                    </button>
+                    <button @click="activeTool = 'crown'" :class="activeTool === 'crown' ? 'bg-yellow-50 ring-2 ring-yellow-400 font-bold text-yellow-700' : 'hover:bg-yellow-50'" class="w-full flex items-center p-2.5 rounded-xl text-sm text-gray-700 transition-all font-medium">
+                        <span class="w-6 h-6 rounded bg-[#eab308] mr-3 shadow-sm"></span> Crown
+                    </button>
+                    <button @click="activeTool = 'extracted'" :class="activeTool === 'extracted' ? 'bg-gray-100 ring-2 ring-gray-500 font-bold text-gray-800' : 'hover:bg-gray-100'" class="w-full flex items-center p-2.5 rounded-xl text-sm text-gray-700 transition-all font-medium">
+                        <span class="w-6 h-6 rounded border-2 border-[#6b7280] flex items-center justify-center mr-3 shadow-sm"><svg class="w-4 h-4 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></span> Extracted
+                    </button>
+                </div>
+                
+                <div class="border-t border-gray-100 pt-4">
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Or Add Treatment:</label>
+                    <select x-model="activeTool" class="w-full border-gray-200 rounded-xl shadow-sm focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm py-2.5 mb-1 bg-gray-50 font-medium">
+                        <option value="">-- Catalog --</option>
+                        <template x-for="item in treatmentCatalogs" :key="item.id">
+                            <option :value="'treatment_' + item.id" x-text="`${item.name} (${item.default_price} DH)`"></option>
+                        </template>
+                    </select>
+                    <p class="text-[10px] text-gray-400 mt-2 leading-tight text-center font-medium bg-gray-50 rounded-lg p-2">Select a tool, then click on any tooth surface.</p>
+                </div>
+            </div>
+            <!-- End Screen View -->
+        <!-- ========================================== -->
+        <!--              DEDICATED PRINT VIEW            -->
+        <!-- ========================================== -->
+        <div id="print-area" class="hidden print:flex text-black">
+            <!-- Header -->
+            <div class="print-header-area w-full">
+                                <div class="w-1/2 flex items-start gap-4">
+                                        <div>
+                        <h1 class="text-2xl font-black text-black tracking-tight leading-none mb-1 uppercase">Pearl Dental Care</h1>
+                        <p class="text-[10px] text-gray-600 leading-tight w-48"></p>
+                        <p class="text-[10px] text-gray-600 leading-tight mb-2"></p>
+                        <p class="text-[13px] text-gray-800 font-bold">Dr. __________________</p>
+                    </div>
+                </div>
+                <div class="w-1/2 text-right text-[11px] leading-snug">
+                    <p><strong>Patient:</strong> Mustapha Talha</p>
+                    <p><strong>Age:</strong> 24 Ans &nbsp;|&nbsp; <strong>Tel:</strong> +212702850465</p>
+                    <p><strong>CNSS / Mutuelle:</strong> ......................................</p>
+                    <p><strong>Date:</strong> 11/08/2026</p>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="print-body-area w-full">
+                
+                <!-- Left: Chart -->
+                <div class="print-chart-area pt-2">
+                    <div class="print-chart-scale w-full" x-show="!isChild">
+                        <!-- Adult Chart Replica (Scaled down) -->
+                        <div class="mb-2 text-center text-xs font-bold text-gray-700 uppercase tracking-widest">Upper Arch</div>
+                        <div class="flex justify-center gap-1 mb-8 pb-32">
+                            <div class="flex gap-1 border-r-2 border-gray-200 pr-2">
+                                <template x-for="tooth in [18,17,16,15,14,13,12,11]" :key="tooth">
+                                    <div class="flex flex-col items-center" :style="getArchStyle(tooth)">
+                                        <span class="text-[9px] font-bold text-gray-500 mb-1" x-text="tooth"></span>
+                                        <div class="w-8 h-8"><div x-html="renderToothInteractive(tooth)"></div></div>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="flex gap-1 pl-2">
+                                <template x-for="tooth in [21,22,23,24,25,26,27,28]" :key="tooth">
+                                    <div class="flex flex-col items-center" :style="getArchStyle(tooth)">
+                                        <span class="text-[9px] font-bold text-gray-500 mb-1" x-text="tooth"></span>
+                                        <div class="w-8 h-8"><div x-html="renderToothInteractive(tooth)"></div></div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="mb-2 text-center text-xs font-bold text-gray-700 uppercase tracking-widest mt-16">Lower Arch</div>
+                        <div class="flex justify-center gap-1 mb-8 pt-32">
+                            <div class="flex gap-1 border-r-2 border-gray-200 pr-2">
+                                <template x-for="tooth in [48,47,46,45,44,43,42,41]" :key="tooth">
+                                    <div class="flex flex-col items-center" :style="getArchStyle(tooth)">
+                                        <div class="w-8 h-8"><div x-html="renderToothInteractive(tooth)"></div></div>
+                                        <span class="text-[9px] font-bold text-gray-500 mt-1" x-text="tooth"></span>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="flex gap-1 pl-2">
+                                <template x-for="tooth in [31,32,33,34,35,36,37,38]" :key="tooth">
+                                    <div class="flex flex-col items-center" :style="getArchStyle(tooth)">
+                                        <div class="w-8 h-8"><div x-html="renderToothInteractive(tooth)"></div></div>
+                                        <span class="text-[9px] font-bold text-gray-500 mt-1" x-text="tooth"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="print-chart-scale w-full" x-show="isChild">
+                        <!-- Pediatric Replica -->
+                        <div class="flex justify-center gap-1 mb-8 pb-20">
+                            <div class="flex gap-1 border-r-2 border-gray-200 pr-2">
+                                <template x-for="tooth in [55,54,53,52,51]" :key="tooth">
+                                    <div class="flex flex-col items-center" :style="getArchStyle(tooth)">
+                                        <span class="text-[9px] font-bold text-gray-500 mb-1" x-text="tooth"></span>
+                                        <div class="w-8 h-8"><div x-html="renderToothInteractive(tooth)"></div></div>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="flex gap-1 pl-2">
+                                <template x-for="tooth in [61,62,63,64,65]" :key="tooth">
+                                    <div class="flex flex-col items-center" :style="getArchStyle(tooth)">
+                                        <span class="text-[9px] font-bold text-gray-500 mb-1" x-text="tooth"></span>
+                                        <div class="w-8 h-8"><div x-html="renderToothInteractive(tooth)"></div></div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="flex justify-center gap-1 pt-20">
+                            <div class="flex gap-1 border-r-2 border-gray-200 pr-2">
+                                <template x-for="tooth in [85,84,83,82,81]" :key="tooth">
+                                    <div class="flex flex-col items-center" :style="getArchStyle(tooth)">
+                                        <div class="w-8 h-8"><div x-html="renderToothInteractive(tooth)"></div></div>
+                                        <span class="text-[9px] font-bold text-gray-500 mt-1" x-text="tooth"></span>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="flex gap-1 pl-2">
+                                <template x-for="tooth in [71,72,73,74,75]" :key="tooth">
+                                    <div class="flex flex-col items-center" :style="getArchStyle(tooth)">
+                                        <div class="w-8 h-8"><div x-html="renderToothInteractive(tooth)"></div></div>
+                                        <span class="text-[9px] font-bold text-gray-500 mt-1" x-text="tooth"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Table -->
+                <div class="print-table-area pt-2">
+                    <table class="print-table w-full text-black">
+                        <thead>
+                            <tr>
+                                <th class="w-[15%]">DATES</th>
+                                <th class="w-[40%]">NATURES DES OPÉRATIONS</th>
+                                <th class="w-[15%]">PRIX CONVENU</th>
+                                <th class="w-[15%]">REÇU</th>
+                                <th class="w-[15%]">A RECEVOIR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Grouped Rows -->
+                            <template x-for="(group, index) in getGroupedTreatments()" :key="index">
+                                <tr>
+                                    <td class="text-center font-medium">11/08/26</td>
+                                    <td class="font-bold">
+                                        <span x-text="group.description"></span>
+                                        <br>
+                                        <span class="text-[10px] text-gray-600 font-normal">Dents: <span x-text="group.teeth.join(', ')"></span></span>
+                                    </td>
+                                    <td class="text-right font-medium" x-text="formatPrice(group.totalPrice)"></td>
+                                    <td class="text-right font-medium" x-text="formatPrice(group.totalReceived)"></td>
+                                    <td class="text-right font-bold text-black" x-text="formatPrice(group.totalPrice - group.totalReceived)"></td>
+                                </tr>
+                            </template>
+
+                            <!-- Empty Rows (Padding) -->
+                            <template x-if="!hasFindings()">
+                                <template x-for="i in 10">
+                                    <tr class="h-[30px]">
+                                        <td></td><td></td><td></td><td></td><td></td>
+                                    </tr>
+                                </template>
+                            </template>
+                            <template x-if="hasFindings()">
+                                <template x-for="i in Math.max(0, 5 - getGroupedTreatments().length)">
+                                    <tr class="h-[30px]">
+                                        <td></td><td></td><td></td><td></td><td></td>
+                                    </tr>
+                                </template>
+                            </template>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2" class="font-black text-center text-[12px]">A REPORTER</td>
+                                <td class="text-right font-bold" x-text="formatPrice(calculateTotal())"></td>
+                                <td class="text-right font-bold" x-text="formatPrice(calculateReceived())"></td>
+                                <td class="text-right font-black text-[13px]" x-text="formatPrice(calculateTotal() - calculateReceived())"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+            </div>
+            
+            <!-- Footer Signature Space -->
+            <div class="w-full flex justify-between items-end pt-4 mt-auto">
+                <div class="text-[10px] text-gray-500 font-medium">Document généré le 11/08/2026 10:44</div>
+                <div class="text-[12px] font-bold text-black border-t-2 border-black pt-1 w-48 text-center">Cachet & Signature</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('odontogram', () => ({
+                activeTool: 'eraser',
+                treatmentCatalogs: [],
+                
+                chartData: {},
+                isSaving: false,
+                isChild: false,
+                canEditChart: false,
+                
+                // Existing findings from DB
+                findings: [],
+
+                init() {
+                    const allTeeth = [
+                        18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28,
+                        48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38,
+                        55,54,53,52,51, 61,62,63,64,65,
+                        85,84,83,82,81, 71,72,73,74,75
+                    ];
+                    
+                    // Initialize empty
+                    allTeeth.forEach(t => {
+                        this.chartData[t] = {
+                            status: 'healthy',
+                            surfaces: { T: 'healthy', R: 'healthy', B: 'healthy', L: 'healthy', C: 'healthy' },
+                            treatments: [], // array of objects: { catalog_id, name, price }
+                            received: 0
+                        };
+                    });
+                    
+                    // Populate from DB findings
+                    if (this.findings && this.findings.length > 0) {
+                        this.findings.forEach(f => {
+                            if (this.chartData[f.tooth_number]) {
+                                this.chartData[f.tooth_number].status = f.status;
+                                if (f.surfaces) {
+                                    this.chartData[f.tooth_number].surfaces = f.surfaces;
+                                }
+                                
+                                // Load treatments if they exist
+                                if (f.treatments && Array.isArray(f.treatments) && f.treatments.length > 0) {
+                                    this.chartData[f.tooth_number].treatments = f.treatments;
+                                } 
+                                // Legacy price support: if it has a price but no array of treatments, add a generic one
+                                else {
+                                    let price = f.price ? parseFloat(f.price) : 0;
+                                    if (price > 0) {
+                                        this.chartData[f.tooth_number].treatments.push({
+                                            id: null,
+                                            name: 'Legacy Treatment',
+                                            price: price
+                                        });
+                                    }
+                                }
+                                
+                                if (f.price !== undefined) {
+                                    this.chartData[f.tooth_number].price = f.price;
+                                }
+                                if (f.received !== undefined) {
+                                    this.chartData[f.tooth_number].received = parseFloat(f.received);
+                                } else {
+                                    this.chartData[f.tooth_number].received = 0; 
+                                }
+                            }
+                        });
+                    }
+
+                    // Listen for save and print events
+                    window.addEventListener('save-odontogram', () => this.saveChart());
+                    window.addEventListener('print-chart', () => this.printChart());
+                },
+
+                applyTool(tooth, surface = null) {
+                    if(!this.canEditChart) return;
+                    if(!this.activeTool) return;
+                    
+                    if(this.activeTool.startsWith('treatment_')) {
+                        // It's a catalog treatment
+                        let catalogId = this.activeTool.split('_')[1];
+                        let item = this.treatmentCatalogs.find(t => t.id == catalogId);
+                        if(item) {
+                            this.chartData[tooth].treatments.push({
+                                id: item.id,
+                                name: item.name,
+                                price: parseFloat(item.default_price)
+                            });
+                        }
+                    } else {
+                        // Basic tools
+                        if(this.activeTool === 'eraser') {
+                            if(surface) {
+                                this.chartData[tooth].surfaces[surface] = 'healthy';
+                            } else {
+                                this.chartData[tooth].status = 'healthy';
+                                this.chartData[tooth].surfaces = { T: 'healthy', R: 'healthy', B: 'healthy', L: 'healthy', C: 'healthy' };
+                            }
+                        } else if(this.activeTool === 'extracted') {
+                            this.chartData[tooth].status = 'extracted';
+                        } else if(this.activeTool === 'crown') {
+                            this.chartData[tooth].status = 'crown';
+                        } else if(['decayed', 'filled'].includes(this.activeTool)) {
+                            if(surface) {
+                                this.chartData[tooth].surfaces[surface] = this.activeTool;
+                                if(this.chartData[tooth].status === 'extracted') this.chartData[tooth].status = 'healthy';
+                            } else {
+                                this.chartData[tooth].status = this.activeTool; // overall status
+                            }
+                        }
+                    }
+                },
+                
+                isToothAffected(tooth) {
+                    if (!this.chartData[tooth]) return false;
+                    let data = this.chartData[tooth];
+                    if (data.status !== 'healthy') return true;
+                    if (data.treatments.length > 0) return true;
+                    for (let surf in data.surfaces) {
+                        if (data.surfaces[surf] !== 'healthy') return true;
+                    }
+                    return false;
+                },
+
+                hasFindings() {
+                    for(let tooth in this.chartData) {
+                        if(this.isToothAffected(tooth)) return true;
+                    }
+                    return false;
+                },
+
+                getTreatmentDescription(tooth) {
+                    let data = this.chartData[tooth];
+                    if(!data) return '';
+                    
+                    let parts = [];
+                    // Add diagnostics
+                    if(data.status === 'extracted') parts.push('Extraction (Missing)');
+                    if(data.status === 'decayed') parts.push('Decayed');
+                    
+                    for(let surf in data.surfaces) {
+                        if(data.surfaces[surf] === 'decayed') parts.push(`Caries (${surf})`);
+                        if(data.surfaces[surf] === 'filled') parts.push(`Filling (${surf})`);
+                    }
+                    
+                    // Add explicit planned treatments
+                    data.treatments.forEach(t => {
+                        parts.push(t.name);
+                    });
+
+                    return parts.join(', ');
+                },
+
+                calculateTotal() {
+                    let total = 0;
+                    for (const tooth in this.chartData) {
+                        if (this.isToothAffected(tooth)) {
+                            this.chartData[tooth].treatments.forEach(t => {
+                                total += parseFloat(t.price || 0);
+                            });
+                        }
+                    }
+                    return total;
+                },
+                
+                calculateReceived() {
+                    let total = 0;
+                    for (const tooth in this.chartData) {
+                        if (this.isToothAffected(tooth)) {
+                            total += parseFloat(this.chartData[tooth].received || 0);
+                        }
+                    }
+                    return total;
+                },
+                
+                printChart() {
+                    const printElement = document.getElementById('print-area');
+                    
+                    // Capture all CSS from the current page
+                    let styles = '';
+                    document.querySelectorAll('style, link[rel="stylesheet"]').forEach(node => {
+                        styles += node.outerHTML;
+                    });
+
+                    // Remove old iframe if it exists
+                    let oldIframe = document.getElementById('hidden-print-iframe');
+                    if (oldIframe) {
+                        oldIframe.remove();
+                    }
+
+                    // Create a hidden iframe
+                    const iframe = document.createElement('iframe');
+                    iframe.id = 'hidden-print-iframe';
+                    iframe.style.position = 'absolute';
+                    iframe.style.width = '100vw'; // Need real dimensions to render SVG
+                    iframe.style.height = '100vh';
+                    iframe.style.left = '-9999px';
+                    iframe.style.top = '-9999px';
+                    iframe.style.border = 'none';
+                    document.body.appendChild(iframe);
+
+                    // Inject the HTML and specific print styles into the iframe
+                    const doc = iframe.contentWindow.document;
+                    doc.head.innerHTML = '<title>Dental Chart - Mustapha Talha</title>' + styles + '<style>@page{size: landscape; margin: 0 !important;} html, body{margin: 0 !important; padding: 0 !important; width: 100%; height: 100%; background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;} .a5-container{display: flex; flex-direction: column; width: 100%; height: 100%; padding: 10mm 15mm; box-sizing: border-box; margin: 0; background: white;} .print-header-area{display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; flex: 0 0 auto;} .print-body-area{display: flex; flex-direction: row; flex: 1 1 auto;} .print-chart-area{width: 45%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-right: 15px;} .print-table-area{width: 55%; padding-left: 15px; display: flex; flex-direction: column; border-left: 2px solid #000;} .print-table{width: 100%; border-collapse: collapse; font-size: 12px; color: black;} .print-table th, .print-table td{border: 1px solid #000; padding: 6px; text-align: left; color: black;} .print-table th{background-color: #f3f4f6 !important; font-weight: bold; color: black;} .print-chart-scale{width: 550px; transform: scale(0.65); transform-origin: top center; display: flex; flex-direction: column; align-items: center;} ::-webkit-scrollbar{display: none;} .text-gray-500, .text-gray-600, .text-gray-700, .text-gray-900{color: black !important;}</style>';
+                    doc.body.style.background = 'white';
+                    doc.body.innerHTML = '<div class="a5-container">' + printElement.innerHTML + '</div>';
+
+                    // Wait for external CSS to load before printing the iframe
+                    setTimeout(() => {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    }, 1200); // Increased wait time to ensure styles and SVGs render
+                },
+
+                getGroupedTreatments() {
+                    const groups = {};
+
+                    for (const tooth in this.chartData) {
+                        if (this.isToothAffected(tooth)) {
+                            // Sum up price from treatments array
+                            let toothTotalPrice = 0;
+                            this.chartData[tooth].treatments.forEach(t => {
+                                toothTotalPrice += parseFloat(t.price || 0);
+                            });
+
+                            const desc = this.getTreatmentDescription(tooth) || 'Consultation / Diagnosis';
+                            if (!groups[desc]) {
+                                groups[desc] = {
+                                    description: desc,
+                                    teeth: [],
+                                    totalPrice: 0,
+                                    totalReceived: 0
+                                };
+                            }
+                            groups[desc].teeth.push(tooth);
+                            groups[desc].totalPrice += toothTotalPrice;
+                            groups[desc].totalReceived += parseFloat(this.chartData[tooth].received || 0);
+                        }
+                    }
+
+                    return Object.values(groups);
+                },
+
+                formatPrice(price) {
+                    return (parseFloat(price) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' DH';
+                },
+
+                getArchStyle(tooth) {
+                    let isUpper = false;
+                    let isAdult = true;
+                    let index = 0;
+                    
+                    let t = parseInt(tooth);
+                    
+                    if(t >= 11 && t <= 18) { isUpper = true; isAdult = true; index = t - 11; }
+                    if(t >= 21 && t <= 28) { isUpper = true; isAdult = true; index = t - 21; }
+                    
+                    if(t >= 41 && t <= 48) { isUpper = false; isAdult = true; index = t - 41; }
+                    if(t >= 31 && t <= 38) { isUpper = false; isAdult = true; index = t - 31; }
+                    
+                    if(t >= 51 && t <= 55) { isUpper = true; isAdult = false; index = t - 51; }
+                    if(t >= 61 && t <= 65) { isUpper = true; isAdult = false; index = t - 61; }
+                    
+                    if(t >= 81 && t <= 85) { isUpper = false; isAdult = false; index = t - 81; }
+                    if(t >= 71 && t <= 75) { isUpper = false; isAdult = false; index = t - 71; }
+                    
+                    // Create a perfect U-shape curve
+                    let multY = isAdult ? 6.0 : 7.0;
+                    let multX = isAdult ? 2.5 : 3.0;
+                    
+                    let y = Math.pow(index, 1.4) * multY;
+                    let x = Math.pow(index, 1.2) * multX;
+                    
+                    // Push molars outward (widen the U shape symmetrically)
+                    let isLeftQuad = (t >= 11 && t <= 18) || (t >= 41 && t <= 48) || (t >= 51 && t <= 55) || (t >= 81 && t <= 85);
+                    if (isLeftQuad) {
+                        x = -x;
+                    }
+                    
+                    // Invert Y for lower arch
+                    if(!isUpper) y = -y;
+                    
+                    return `transform: translate3d(${x}px, ${y}px, 0);`;
+                },
+
+                isToothAffected(tooth) {
+                    let data = this.chartData[tooth];
+                    if(!data) return false;
+                    if(data.status !== 'healthy') return true;
+                    return Object.values(data.surfaces).some(s => s !== 'healthy');
+                },
+
+                hasFindings() {
+                    return Object.keys(this.chartData).some(t => this.isToothAffected(t));
+                },
+
+                getTreatmentDescription(tooth) {
+                    let data = this.chartData[tooth];
+                    if(!data) return '';
+                    
+                    let parts = [];
+                    
+                    // Diagnostics
+                    if(data.status === 'extracted') parts.push('Extraction (Missing)');
+                    if(data.status === 'crown') parts.push('Crown / Bridge');
+                    if(data.status === 'decayed') parts.push('Decayed');
+                    
+                    for(let surf in data.surfaces) {
+                        if(data.surfaces[surf] === 'decayed') parts.push(`Caries (${surf})`);
+                        if(data.surfaces[surf] === 'filled') parts.push(`Filling (${surf})`);
+                    }
+                    
+                    // Explicit Planned Treatments from Catalog
+                    if (data.treatments && data.treatments.length > 0) {
+                        data.treatments.forEach(t => {
+                            parts.push(t.name);
+                        });
+                    }
+
+                    return parts.join(', ');
+                },
+
+                calculateTotal() {
+                    let total = 0;
+                    for (const tooth in this.chartData) {
+                        if (this.isToothAffected(tooth)) {
+                            total += parseFloat(this.chartData[tooth].price || 0);
+                        }
+                    }
+                    return total;
+                },
+                
+                calculateReceived() {
+                    let total = 0;
+                    for (const tooth in this.chartData) {
+                        if (this.isToothAffected(tooth)) {
+                            total += parseFloat(this.chartData[tooth].received || 0);
+                        }
+                    }
+                    return total;
+                },
+
+                getGroupedTreatments() {
+                    const groups = {};
+
+                    for (const tooth in this.chartData) {
+                        if (this.isToothAffected(tooth)) {
+                            // Sum up price from treatments array
+                            let toothTotalPrice = 0;
+                            this.chartData[tooth].treatments.forEach(t => {
+                                toothTotalPrice += parseFloat(t.price || 0);
+                            });
+
+                            const desc = this.getTreatmentDescription(tooth) || 'Consultation / Diagnosis';
+                            if (!groups[desc]) {
+                                groups[desc] = {
+                                    description: desc,
+                                    teeth: [],
+                                    totalPrice: 0,
+                                    totalReceived: 0
+                                };
+                            }
+                            groups[desc].teeth.push(tooth);
+                            groups[desc].totalPrice += toothTotalPrice;
+                            groups[desc].totalReceived += parseFloat(this.chartData[tooth].received || 0);
+                        }
+                    }
+
+                    return Object.values(groups);
+                },
+
+                formatPrice(price) {
+                    return (parseFloat(price) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' DH';
+                },
+
+                // Remove applyTool, we now use openEditor
+
+                getSurfaceColor(tooth, surface) {
+                    let data = this.chartData[tooth];
+                    if(!data) return '#ffffff'; // White (healthy)
+                    
+                    if(data.status === 'extracted') return 'none';
+                    if(data.status === 'crown') return '#fef08a'; // Yellow
+                    
+                    let surfStatus = data.surfaces[surface];
+                    if(surfStatus === 'decayed') return '#ef4444'; // Red
+                    if(surfStatus === 'filled') return '#3b82f6'; // Blue
+                    
+                    return '#ffffff'; // White
+                },
+
+                getToothStroke(tooth) {
+                    let data = this.chartData[tooth];
+                    if(!data) return '#d1d5db';
+                    if(data.status === 'extracted') return 'none'; 
+                    if(data.status === 'crown') return '#ca8a04';
+                    return '#9ca3af'; // Slightly darker border for better visibility
+                },
+
+                // Renders the interactive tooth SVG directly on the chart
+                renderToothInteractive(tooth) {
+                    if(!tooth) return '';
+                    let data = this.chartData[tooth];
+
+                    let stroke = this.getToothStroke(tooth);
+                    let cT = this.getSurfaceColor(tooth, 'T');
+                    let cR = this.getSurfaceColor(tooth, 'R');
+                    let cB = this.getSurfaceColor(tooth, 'B');
+                    let cL = this.getSurfaceColor(tooth, 'L');
+                    let cC = this.getSurfaceColor(tooth, 'C');
+
+                    let isExtracted = data && data.status === 'extracted';
+                    let hasTreatments = data && data.treatments.length > 0;
+
+                    let svg = `<svg viewBox="0 0 100 100" class="w-full h-full relative" @click.stop="applyTool(${tooth}, null)">`;
+                    
+                    if(isExtracted) {
+                        svg += `
+                            <!-- Invisible background to catch clicks -->
+                            <rect x="0" y="0" width="100" height="100" fill="transparent" class="cursor-pointer" />
+                            <line x1="10" y1="10" x2="90" y2="90" stroke="#9ca3af" stroke-width="8" stroke-linecap="round" class="pointer-events-none"/>
+                            <line x1="90" y1="10" x2="10" y2="90" stroke="#9ca3af" stroke-width="8" stroke-linecap="round" class="pointer-events-none"/>
+                        `;
+                    } else {
+                        // Interactive 5-surface layout
+                        svg += `
+                            <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="${stroke}" stroke-width="3" class="pointer-events-none"/>
+                            
+                            <polygon points="15,15 85,15 65,35 35,35" fill="${cT}" stroke="${stroke}" stroke-width="2" class="cursor-pointer hover:opacity-75 transition-opacity" @click.stop="applyTool(${tooth}, 'T')"/>
+                            
+                            <polygon points="85,15 85,85 65,65 65,35" fill="${cR}" stroke="${stroke}" stroke-width="2" class="cursor-pointer hover:opacity-75 transition-opacity" @click.stop="applyTool(${tooth}, 'R')"/>
+                            
+                            <polygon points="15,85 85,85 65,65 35,65" fill="${cB}" stroke="${stroke}" stroke-width="2" class="cursor-pointer hover:opacity-75 transition-opacity" @click.stop="applyTool(${tooth}, 'B')"/>
+                            
+                            <polygon points="15,15 15,85 35,65 35,35" fill="${cL}" stroke="${stroke}" stroke-width="2" class="cursor-pointer hover:opacity-75 transition-opacity" @click.stop="applyTool(${tooth}, 'L')"/>
+                            
+                            <rect x="35" y="35" width="30" height="30" fill="${cC}" stroke="${stroke}" stroke-width="2" class="cursor-pointer hover:opacity-75 transition-opacity" @click.stop="applyTool(${tooth}, 'C')"/>
+                        `;
+                    }
+
+                    // Add a tiny badge/indicator if treatments are planned
+                    if(hasTreatments) {
+                        svg += `
+                            <circle cx="85" cy="15" r="12" fill="#39D3C4" stroke="#ffffff" stroke-width="2" class="pointer-events-none"/>
+                        `;
+                    }
+
+                    svg += `</svg>`;
+                    return svg;
+                },
+
+                saveChart() {
+                    if (this.isSaving) return;
+                    this.isSaving = true;
+                    
+                    fetch('http://localhost:8000/patients/2/dental-chart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': 'WQkKJcWAvV81opqJhyoYzoWBUtRu9P4c2MV6eggq'
+                        },
+                        body: JSON.stringify({ chartData: this.chartData })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.isSaving = false;
+                        if(data.success) {
+                            alert('Chart saved successfully!');
+                        }
+                    })
+                    .catch(err => {
+                        this.isSaving = false;
+                        alert('Error saving chart.');
+                        console.error(err);
+                    });
+                }
+            }));
+        });
+
+        // Make the tools panel draggable
+        document.addEventListener('DOMContentLoaded', () => {
+            const toolsPanel = document.getElementById('clinical-tools');
+            if (toolsPanel) {
+                let isDragging = false;
+                let startX, startY, initialX, initialY;
+
+                toolsPanel.addEventListener('mousedown', (e) => {
+                    // Only drag if clicking on the header
+                    if(!e.target.closest('.cursor-move')) return;
+                    
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    
+                    const rect = toolsPanel.getBoundingClientRect();
+                    initialX = rect.left;
+                    initialY = rect.top;
+                    
+                    toolsPanel.style.right = 'auto'; // Disable right anchoring
+                    toolsPanel.style.left = initialX + 'px';
+                    toolsPanel.style.top = initialY + 'px';
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    e.preventDefault();
+                    
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    
+                    toolsPanel.style.left = (initialX + dx) + 'px';
+                    toolsPanel.style.top = (initialY + dy) + 'px';
+                });
+
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+            }
+        });
+    </script>
+                    </div>
+                </main>
+            </div>
+            
+        </div>
+            </body>
+</html>

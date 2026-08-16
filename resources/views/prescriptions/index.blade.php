@@ -5,76 +5,163 @@
         </h2>
     </x-slot>
     
-    <x-slot name="header_actions">
-        <!-- Global Search -->
-        <div class="relative w-full sm:w-64 md:w-80 mr-4">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-            </div>
-            <input type="text" class="block w-full pl-9 pr-3 py-1.5 border border-gray-200 rounded-lg leading-5 bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#39D3C4] focus:border-[#39D3C4] sm:text-sm transition-all" placeholder="Search prescriptions...">
-        </div>
-        
-        <a href="{{ route('prescriptions.create') }}" class="inline-flex items-center px-4 py-2 bg-[#39D3C4] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#2db3a6] focus:outline-none focus:ring-2 focus:ring-[#39D3C4] focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm whitespace-nowrap">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-            Write Prescription
-        </a>
+    <x-slot name="header_search">
+        <x-ui.search placeholder="Search prescriptions..." />
     </x-slot>
 
-    <div class="animate-fade-in space-y-6">
+    <x-slot name="header_actions">
+        <x-ui.button variant="primary" x-data x-on:click="$dispatch('open-drawer', 'create-prescription-drawer')">
+            <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Write Prescription
+        </x-ui.button>
+    </x-slot>
+
+    <div class="animate-fade-in pb-10">
         
-        <!-- Prescriptions Table -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-100">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Date</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Patient</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Prescribing Dentist</th>
-                            <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        @forelse($prescriptions as $prescription)
-                            <tr class="hover:bg-gray-50 transition-colors group">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-bold text-gray-900">{{ \Carbon\Carbon::parse($prescription->date)->format('M d, Y') }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-bold text-gray-900">{{ $prescription->patient->first_name }} {{ $prescription->patient->last_name }}</div>
-                                    <div class="text-xs text-gray-500">ID: {{ $prescription->patient->national_id ?? 'N/A' }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">Dr. {{ $prescription->dentist->name }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a href="{{ route('prescriptions.show', $prescription->id) }}" class="inline-flex items-center text-[#39D3C4] hover:text-[#2db3a6] hover:underline">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                                        View & Print
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="px-6 py-12 text-center text-gray-500">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-.586-1.414l-4.5-4.5A2 2 0 0012.5 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14z"></path></svg>
-                                    <h3 class="mt-2 text-sm font-semibold text-gray-900">No prescriptions found</h3>
-                                    <p class="mt-1 text-sm text-gray-500">Click "Write Prescription" to generate your first medical prescription.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+        <!-- Prescriptions Grid -->
+        @if($prescriptions->isEmpty())
+            <x-ui.card class="p-16 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-4 text-gray-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-.586-1.414l-4.5-4.5A2 2 0 0012.5 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14z"></path></svg>
+                </div>
+                <h3 class="text-xl font-medium text-gray-900 mb-2">No prescriptions found</h3>
+                <p class="text-gray-500 max-w-sm mx-auto mb-6">Click "Write Prescription" to generate your first medical prescription.</p>
+                <x-ui.button variant="primary" x-data x-on:click="$dispatch('open-drawer', 'create-prescription-drawer')">
+                    Write Prescription
+                </x-ui.button>
+            </x-ui.card>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                @foreach($prescriptions as $prescription)
+                    <x-ui.card class="group hover:shadow-md transition-all relative h-full flex flex-col p-5">
+                        <!-- Dropdown Actions -->
+                        <div class="absolute top-4 right-4 z-10">
+                            <x-dropdown align="right" width="48">
+                                <x-slot name="trigger">
+                                    <button class="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none" title="More Actions">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                    </button>
+                                </x-slot>
+                                <x-slot name="content">
+                                    <x-dropdown-link href="{{ route('prescriptions.show', $prescription->id) }}">View Details</x-dropdown-link>
+                                    <x-dropdown-link href="{{ route('prescriptions.show', $prescription->id) }}">Print</x-dropdown-link>
+                                    <x-dropdown-link href="#">Download PDF</x-dropdown-link>
+                                    <x-dropdown-link href="#">Duplicate</x-dropdown-link>
+                                    <div class="border-t border-gray-100 my-1"></div>
+                                    <x-dropdown-link href="#" class="text-red-600 hover:bg-red-50">Delete</x-dropdown-link>
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
+
+                        <!-- Date Header -->
+                        <div class="flex items-center mb-4 text-xs font-semibold text-gray-500 bg-gray-50 w-fit px-2 py-1 rounded-md border border-gray-100">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            {{ \Carbon\Carbon::parse($prescription->date)->format('M d, Y') }}
+                        </div>
+
+                        <!-- Patient Info -->
+                        <div class="mb-4">
+                            <div class="flex items-center gap-3 mb-1.5">
+                                <div class="w-8 h-8 rounded-full bg-[#39D3C4]/10 text-[#39D3C4] flex items-center justify-center text-xs font-bold">
+                                    {{ substr($prescription->patient->first_name, 0, 1) }}{{ substr($prescription->patient->last_name, 0, 1) }}
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-bold text-gray-900 group-hover:text-[#39D3C4] transition-colors line-clamp-1">
+                                        {{ $prescription->patient->first_name }} {{ $prescription->patient->last_name }}
+                                    </h3>
+                                    <div class="text-xs text-gray-500">
+                                        ID: {{ $prescription->patient->national_id ?? 'N/A' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prescription Details & Doctor -->
+                        <div class="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100 space-y-2 text-sm flex-1">
+                            <div class="flex items-center gap-2 text-gray-600">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                                <span>{{ $prescription->medications_count ?? '0' }} medications prescribed</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-600">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                Dr. {{ $prescription->dentist->name }}
+                            </div>
+                        </div>
+
+                        <!-- Footer Actions -->
+                        <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
+                            <a href="{{ route('prescriptions.show', $prescription->id) }}" class="inline-flex items-center text-xs font-bold text-[#39D3C4] hover:text-[#2db3a6] transition-colors">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                Print Document
+                            </a>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600">
+                                Issued
+                            </span>
+                        </div>
+                    </x-ui.card>
+                @endforeach
             </div>
             
             @if($prescriptions->hasPages())
-                <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <div class="mt-6">
                     {{ $prescriptions->links() }}
                 </div>
             @endif
-        </div>
-
+        @endif
     </div>
+
+    <!-- Create Prescription Drawer -->
+    <x-ui.drawer id="create-prescription-drawer" title="Write Prescription">
+        <form id="create-prescription-form" action="{{ route('prescriptions.store') }}" method="POST">
+            @csrf
+            
+            <div class="space-y-6">
+                <!-- Patient & Dentist -->
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label for="patient_id" class="block text-sm font-medium text-gray-700 mb-1">Patient <span class="text-red-500">*</span></label>
+                        <select id="patient_id" name="patient_id" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                            <option value="">Select Patient</option>
+                            @foreach($patients as $patient)
+                                <option value="{{ $patient->id }}">{{ $patient->first_name }} {{ $patient->last_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="dentist_id" class="block text-sm font-medium text-gray-700 mb-1">Dentist <span class="text-red-500">*</span></label>
+                        <select id="dentist_id" name="dentist_id" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                            <option value="">Select Dentist</option>
+                            @foreach($dentists as $dentist)
+                                <option value="{{ $dentist->id }}" @selected(old('dentist_id', auth()->id()) == $dentist->id)>Dr. {{ $dentist->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <!-- Date -->
+                    <div>
+                        <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date <span class="text-red-500">*</span></label>
+                        <input type="date" name="date" id="date" value="{{ old('date', date('Y-m-d')) }}" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label for="medications" class="block text-sm font-medium text-gray-700 mb-1">Medications & Dosage (Rx) <span class="text-red-500">*</span></label>
+                        <textarea id="medications" name="medications" rows="6" required placeholder="e.g. 1. Amoxicillin 500mg, 1 tablet every 8 hours for 7 days." class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
+                        <textarea id="notes" name="notes" rows="2" placeholder="e.g. Take medications after meals." class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <x-slot name="footer">
+            <x-ui.button variant="secondary" x-on:click="show = false">Cancel</x-ui.button>
+            <x-ui.button variant="primary" x-on:click="document.getElementById('create-prescription-form').submit()">Generate</x-ui.button>
+        </x-slot>
+    </x-ui.drawer>
 </x-app-layout>

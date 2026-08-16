@@ -1,17 +1,15 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-bold text-xl text-gray-800 leading-tight flex items-center">
-                <span class="bg-[#39D3C4]/10 text-[#39D3C4] p-2 rounded-lg mr-3 shadow-sm">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                </span>
-                {{ __('Appointments Calendar') }}
-            </h2>
-            <button type="button" @click="$dispatch('open-appointment-modal')" class="inline-flex items-center px-4 py-2 bg-[#39D3C4] border border-transparent rounded-xl font-bold text-sm text-white hover:bg-[#2db3a6] focus:outline-none focus:ring-2 focus:ring-[#39D3C4] focus:ring-offset-2 transition shadow-lg transform hover:-translate-y-0.5">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                New Appointment
-            </button>
-        </div>
+    <x-slot name="header_title">
+        <h2 class="font-bold text-xl text-gray-800 leading-tight tracking-tight">
+            {{ __('Appointments Calendar') }}
+        </h2>
+    </x-slot>
+
+    <x-slot name="header_actions">
+        <x-ui.button variant="primary" type="button" @click="$dispatch('open-appointment-modal')">
+            <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            New Appointment
+        </x-ui.button>
     </x-slot>
 
     <!-- FullCalendar CSS -->

@@ -35,7 +35,12 @@ class LabCaseController extends Controller
                             ->whereMonth('updated_at', now()->month)
                             ->count();
                             
-        return view('lab-cases.index', compact('cases', 'activeCount', 'delayedCount', 'receivedMonthCount'));
+        // For the Create Drawer
+        $patients = Patient::where('organization_id', $org_id)->orderBy('first_name')->get();
+        $partners = LabPartner::where('organization_id', $org_id)->orderBy('name')->get();
+        $dentists = User::where('organization_id', $org_id)->orderBy('name')->get();
+
+        return view('lab-cases.index', compact('cases', 'activeCount', 'delayedCount', 'receivedMonthCount', 'patients', 'partners', 'dentists'));
     }
 
     /**

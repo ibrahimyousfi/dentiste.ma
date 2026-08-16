@@ -93,7 +93,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('payments', App\Http\Controllers\PaymentController::class)->only(['store', 'index']);
     
     Route::get('/invoices', function() {
-        return view('invoices.index');
+        $org_id = auth()->user()->organization_id ?? 1;
+        $patients = \App\Models\Patient::where('organization_id', $org_id)->orderBy('first_name')->get();
+        return view('invoices.index', compact('patients'));
     })->name('invoices.index');
     
     Route::get('/invoices/show', function() {

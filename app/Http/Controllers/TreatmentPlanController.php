@@ -34,7 +34,11 @@ class TreatmentPlanController extends Controller
                             ->where('status', 'completed')
                             ->count();
                             
-        return view('treatments.index', compact('plans', 'proposedCount', 'acceptedCount', 'completedCount'));
+        // For Create Drawer
+        $patients = Patient::where('organization_id', $org_id)->orderBy('first_name')->get();
+        $dentists = User::where('organization_id', $org_id)->orderBy('name')->get();
+
+        return view('treatments.index', compact('plans', 'proposedCount', 'acceptedCount', 'completedCount', 'patients', 'dentists'));
     }
 
     /**

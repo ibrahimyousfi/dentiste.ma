@@ -5,24 +5,18 @@
         </h2>
     </x-slot>
 
-    <x-slot name="header_actions">
-        <!-- Global Search -->
-        <div class="relative w-full sm:w-64 md:w-80 mr-4">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-            </div>
-            <input type="text" class="block w-full pl-9 pr-3 py-1.5 border border-gray-200 rounded-lg leading-5 bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#39D3C4] focus:border-[#39D3C4] sm:text-sm transition-all" placeholder="Search treatments...">
-        </div>
-        
-        <a href="{{ route('treatment-plans.create') }}" class="inline-flex items-center px-4 py-2 bg-[#39D3C4] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#2db3a6] focus:outline-none focus:ring-2 focus:ring-[#39D3C4] focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm whitespace-nowrap">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-            Propose Plan
-        </a>
+    <x-slot name="header_search">
+        <x-ui.search placeholder="Search treatments..." />
     </x-slot>
 
-    <div class="animate-fade-in space-y-6">
+    <x-slot name="header_actions">
+        <x-ui.button variant="primary" x-data x-on:click="$dispatch('open-drawer', 'create-treatment-plan-drawer')">
+            <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Propose Plan
+        </x-ui.button>
+    </x-slot>
+
+    <div class="animate-fade-in space-y-6 pb-10">
         
         <!-- Metric Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -31,7 +25,7 @@
                 <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Proposed</p>
                 <div class="flex items-end">
                     <span class="text-3xl font-bold text-gray-900">{{ $proposedCount }}</span>
-                    <span class="ml-2 text-sm font-medium text-gray-500 mb-1">Awaiting patient approval</span>
+                    <span class="ml-2 text-sm font-medium text-gray-500 mb-1">Awaiting approval</span>
                 </div>
             </div>
 
@@ -64,83 +58,172 @@
             </div>
         </div>
 
-        <!-- Treatment Plans Table -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-100">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Patient / Dentist</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Treatment Plan</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Estimated Cost</th>
-                            <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                            <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        @forelse($plans as $plan)
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-bold text-gray-900">{{ $plan->patient->first_name }} {{ $plan->patient->last_name }}</div>
-                                    <div class="text-xs text-gray-500">Dr. {{ $plan->dentist->name }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="h-8 w-8 flex-shrink-0 rounded bg-gray-100 flex items-center justify-center text-gray-500">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <div class="text-sm text-gray-900 font-medium">{{ $plan->name }}</div>
-                                            <div class="text-xs text-gray-500">{{ $plan->sessions_count }} Sessions Scheduled</div>
-                                        </div>
+        <!-- Treatment Plans Grid -->
+        @if($plans->isEmpty())
+            <x-ui.card class="p-16 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-4 text-gray-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                </div>
+                <h3 class="text-xl font-medium text-gray-900 mb-2">No treatment plans found</h3>
+                <p class="text-gray-500 max-w-sm mx-auto mb-6">Click "Propose Plan" to start drafting a treatment.</p>
+                <x-ui.button variant="primary" x-data x-on:click="$dispatch('open-drawer', 'create-treatment-plan-drawer')">
+                    Propose Plan
+                </x-ui.button>
+            </x-ui.card>
+        @else
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                @foreach($plans as $plan)
+                    <x-ui.card class="group hover:shadow-md transition-all relative h-full flex flex-col">
+                        <!-- Dropdown Menu for Actions -->
+                        <div class="absolute top-4 right-4 z-10">
+                            <x-dropdown align="right" width="48">
+                                <x-slot name="trigger">
+                                    <button class="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none" title="More Actions">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                    </button>
+                                </x-slot>
+                                <x-slot name="content">
+                                    <x-dropdown-link href="#">View Plan</x-dropdown-link>
+                                    <x-dropdown-link href="#">Edit</x-dropdown-link>
+                                    <div class="border-t border-gray-100 my-1"></div>
+                                    <x-dropdown-link href="#">Continue Treatment</x-dropdown-link>
+                                    <x-dropdown-link href="#">Add Session</x-dropdown-link>
+                                    <x-dropdown-link href="#">Payment</x-dropdown-link>
+                                    <x-dropdown-link href="#">Documents</x-dropdown-link>
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
+
+                        <!-- Card Header: Treatment Name & Status -->
+                        <div class="mb-4 pr-8">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider 
+                                    {{ $plan->status == 'proposed' ? 'bg-gray-100 text-gray-800' : '' }}
+                                    {{ $plan->status == 'accepted' ? 'bg-blue-100 text-blue-800' : '' }}
+                                    {{ $plan->status == 'completed' ? 'bg-green-100 text-green-800' : '' }}
+                                    {{ $plan->status == 'rejected' ? 'bg-red-100 text-red-800' : '' }}">
+                                    {{ $plan->status }}
+                                </span>
+                                <span class="text-xs text-gray-400 font-medium">{{ $plan->created_at ? $plan->created_at->format('M d, Y') : '' }}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-[#39D3C4] transition-colors line-clamp-1">
+                                {{ $plan->name }}
+                            </h3>
+                            <p class="text-xs text-gray-500 mt-1">Tooth: {{ $plan->tooth ?? 'General' }}</p>
+                        </div>
+
+                        <!-- Patient & Doctor Info -->
+                        <div class="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-[#39D3C4]/10 text-[#39D3C4] flex items-center justify-center text-[10px] font-bold">
+                                        {{ substr($plan->patient->first_name, 0, 1) }}{{ substr($plan->patient->last_name, 0, 1) }}
                                     </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <a href="{{ route('patients.show', $plan->patient) }}" class="text-sm font-semibold text-gray-700 hover:text-[#39D3C4] transition-colors">
+                                        {{ $plan->patient->first_name }} {{ $plan->patient->last_name }}
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-gray-500">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                Dr. {{ $plan->dentist->name }}
+                            </div>
+                        </div>
+
+                        <!-- Progress Section -->
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Progress</span>
+                                <span class="text-xs font-bold text-gray-900">{{ $plan->completed_sessions ?? 0 }}/{{ $plan->sessions_count ?? 0 }}</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                @php
+                                    $progress = $plan->sessions_count > 0 ? (($plan->completed_sessions ?? 0) / $plan->sessions_count) * 100 : 0;
+                                @endphp
+                                <div class="h-full bg-[#39D3C4] rounded-full transition-all duration-500" style="width: {{ $progress }}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Financials -->
+                        <div class="mt-auto pt-4 border-t border-gray-100">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Estimated</div>
                                     <div class="text-sm font-bold text-gray-900">${{ number_format($plan->total_estimated_cost, 2) }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    @if($plan->status == 'proposed')
-                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-gray-100 text-gray-800">
-                                            Proposed
-                                        </span>
-                                    @elseif($plan->status == 'accepted')
-                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-blue-100 text-blue-800">
-                                            Accepted
-                                        </span>
-                                    @elseif($plan->status == 'completed')
-                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-green-100 text-green-800">
-                                            Completed
-                                        </span>
-                                    @else
-                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-red-100 text-red-800">
-                                            Rejected
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button class="text-[#39D3C4] hover:text-[#2db3a6] hover:underline mr-3">Sessions</button>
-                                    <button class="text-gray-500 hover:text-gray-900 hover:underline">View</button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                                    <h3 class="mt-2 text-sm font-semibold text-gray-900">No treatment plans found</h3>
-                                    <p class="mt-1 text-sm text-gray-500">Click "Propose Plan" to start drafting a treatment.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Paid / Remaining</div>
+                                    <div class="text-sm font-medium text-gray-500">
+                                        <span class="text-emerald-600 font-bold">${{ number_format($plan->amount_paid ?? 0, 2) }}</span> / 
+                                        <span class="text-rose-500 font-bold">${{ number_format($plan->total_estimated_cost - ($plan->amount_paid ?? 0), 2) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </x-ui.card>
+                @endforeach
             </div>
             
             @if($plans->hasPages())
-                <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <div class="mt-6">
                     {{ $plans->links() }}
                 </div>
             @endif
-        </div>
-
+        @endif
     </div>
+
+    <!-- Create Treatment Plan Drawer -->
+    <x-ui.drawer id="create-treatment-plan-drawer" title="Propose Treatment Plan">
+        <form id="create-treatment-plan-form" action="{{ route('treatment-plans.store') }}" method="POST">
+            @csrf
+            
+            <div class="space-y-6">
+                <!-- Participants -->
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label for="patient_id" class="block text-sm font-medium text-gray-700 mb-1">Patient <span class="text-red-500">*</span></label>
+                        <select id="patient_id" name="patient_id" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                            <option value="">Select Patient</option>
+                            @foreach($patients as $patient)
+                                <option value="{{ $patient->id }}">{{ $patient->first_name }} {{ $patient->last_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="dentist_id" class="block text-sm font-medium text-gray-700 mb-1">Dentist <span class="text-red-500">*</span></label>
+                        <select id="dentist_id" name="dentist_id" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                            <option value="">Select Dentist</option>
+                            @foreach($dentists as $dentist)
+                                <option value="{{ $dentist->id }}" @selected(old('dentist_id', auth()->id()) == $dentist->id)>Dr. {{ $dentist->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Plan Details & Cost -->
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Treatment Plan Title <span class="text-red-500">*</span></label>
+                        <input type="text" name="name" id="name" value="{{ old('name') }}" required placeholder="e.g. Full Mouth Rehabilitation - Phase 1" class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                    </div>
+
+                    <div>
+                        <label for="total_estimated_cost" class="block text-sm font-medium text-gray-700 mb-1">Total Estimated Cost ($) <span class="text-red-500">*</span></label>
+                        <input type="number" step="0.01" min="0" name="total_estimated_cost" id="total_estimated_cost" value="{{ old('total_estimated_cost') }}" required placeholder="0.00" class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                    </div>
+                    
+                    <div>
+                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Clinical Notes & Summary</label>
+                        <textarea id="notes" name="notes" rows="4" placeholder="Brief overview of the planned procedures..." class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">{{ old('notes') }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <x-slot name="footer">
+            <x-ui.button variant="secondary" x-on:click="show = false">Cancel</x-ui.button>
+            <x-ui.button variant="primary" x-on:click="document.getElementById('create-treatment-plan-form').submit()">Save Proposed Plan</x-ui.button>
+        </x-slot>
+    </x-ui.drawer>
 </x-app-layout>

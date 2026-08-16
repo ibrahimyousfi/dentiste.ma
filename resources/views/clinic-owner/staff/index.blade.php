@@ -5,102 +5,174 @@
         </h2>
     </x-slot>
     
-    <x-slot name="header_actions">
-        <!-- Global Search -->
-        <div class="relative w-full sm:w-64 md:w-80 mr-4">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-            </div>
-            <input type="text" class="block w-full pl-9 pr-3 py-1.5 border border-gray-200 rounded-lg leading-5 bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#39D3C4] focus:border-[#39D3C4] sm:text-sm transition-all" placeholder="Search staff...">
-        </div>
-
-        <a href="{{ route('staff.create') }}" class="inline-flex items-center px-4 py-2 bg-[#39D3C4] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#2db3a6] focus:outline-none focus:ring-2 focus:ring-[#39D3C4] focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm whitespace-nowrap">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-            Add Staff Member
-        </a>
+    <x-slot name="header_search">
+        <x-ui.search placeholder="Search staff..." />
     </x-slot>
 
-    <div class="animate-fade-in">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
-            
-            @if(session('success'))
-                <div class="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl relative shadow-sm flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    <span class="font-medium">{{ session('success') }}</span>
-                </div>
-            @endif
+    <x-slot name="header_actions">
+        <x-ui.button variant="primary" x-data x-on:click="$dispatch('open-drawer', 'create-staff-drawer')">
+            <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Add Staff Member
+        </x-ui.button>
+    </x-slot>
 
-            <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-100">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50/80">
-                            <tr>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Staff Member</th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Contact Info</th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Role</th>
-                                <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white">
-                            @forelse($staffMembers as $staff)
-                                <tr class="hover:bg-gray-50 transition-colors group">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-[#39D3C4]/20 to-blue-500/20 group-hover:from-[#39D3C4]/40 group-hover:to-blue-500/40 flex items-center justify-center text-gray-700 font-bold text-sm shadow-sm transition-all border border-gray-100 group-hover:border-[#39D3C4]/50">
-                                                {{ substr($staff->name, 0, 2) }}
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-bold text-gray-900 group-hover:text-[#39D3C4] transition-colors">
-                                                    {{ $staff->name }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-semibold text-gray-900">{{ $staff->email }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        @foreach($staff->roles as $role)
-                                            <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-bold rounded mt-1 bg-[#39D3C4]/10 text-[#39D3C4] uppercase tracking-wider">
-                                                {{ $role->name }}
-                                            </span>
-                                        @endforeach
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div class="flex items-center justify-end space-x-3">
-                                            <a href="{{ route('staff.edit', $staff->id) }}" class="inline-flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors shadow-sm" title="Edit Staff">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                            </a>
-                                            @if($staff->id !== Auth::id())
-                                            <form action="{{ route('staff.destroy', $staff->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this staff member?');" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="inline-flex items-center justify-center w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:text-red-700 transition-colors shadow-sm" title="Delete Staff">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                                </button>
-                                            </form>
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-6 py-12 text-center">
-                                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#39D3C4]/10 mb-4 text-[#39D3C4]">
-                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                        </div>
-                                        <h3 class="text-lg font-medium text-gray-900 mb-1">No staff members found</h3>
-                                        <p class="text-gray-500 text-sm max-w-sm mx-auto">Get started by adding a new staff member.</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+    <div class="animate-fade-in pb-10">
+        @if(session('success'))
+            <div class="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl relative shadow-sm flex items-center">
+                <svg class="w-5 h-5 mr-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="font-medium">{{ session('success') }}</span>
+            </div>
+        @endif
+
+        @if($staffMembers->isEmpty())
+            <x-ui.card class="p-16 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#39D3C4]/10 mb-4 text-[#39D3C4]">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-1">No staff members found</h3>
+                <p class="text-gray-500 text-sm max-w-sm mx-auto mb-6">Get started by adding a new staff member to your clinic.</p>
+                <x-ui.button variant="primary" x-data x-on:click="$dispatch('open-drawer', 'create-staff-drawer')">
+                    Add Staff Member
+                </x-ui.button>
+            </x-ui.card>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                @foreach($staffMembers as $staff)
+                    <x-ui.card class="group hover:shadow-md transition-all relative h-full flex flex-col">
+                        <!-- Dropdown Menu for Actions -->
+                        <div class="absolute top-4 right-4 z-10">
+                            <x-dropdown align="right" width="48">
+                                <x-slot name="trigger">
+                                    <button class="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none" title="More Actions">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                    </button>
+                                </x-slot>
+                                <x-slot name="content">
+                                    <x-dropdown-link href="{{ route('staff.edit', $staff->id) }}">Edit Profile</x-dropdown-link>
+                                    <x-dropdown-link href="#">Manage Permissions</x-dropdown-link>
+                                    <x-dropdown-link href="#">View Schedule</x-dropdown-link>
+                                    <div class="border-t border-gray-100 my-1"></div>
+                                    @if($staff->id !== Auth::id())
+                                        <form action="{{ route('staff.destroy', $staff->id) }}" method="POST" class="w-full">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="block w-full px-4 py-2 text-left text-sm leading-5 text-red-600 hover:bg-red-50 focus:outline-none transition duration-150 ease-in-out" onclick="return confirm('Are you sure you want to deactivate or remove this staff member?');">
+                                                Deactivate / Remove
+                                            </button>
+                                        </form>
+                                    @endif
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
+
+                        <!-- Card Content -->
+                        <div class="flex flex-col items-center text-center p-2 flex-1">
+                            <!-- Avatar -->
+                            <div class="h-20 w-20 rounded-full bg-gradient-to-br from-[#39D3C4]/20 to-blue-500/20 group-hover:from-[#39D3C4]/30 group-hover:to-blue-500/30 flex items-center justify-center text-gray-700 font-bold text-2xl shadow-sm transition-all border-4 border-white mb-3">
+                                {{ substr($staff->name, 0, 2) }}
+                            </div>
+                            
+                            <!-- Name & Roles -->
+                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-[#39D3C4] transition-colors">
+                                {{ $staff->name }}
+                            </h3>
+                            <div class="mt-1 flex flex-wrap justify-center gap-1">
+                                @foreach($staff->roles as $role)
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#39D3C4]/10 text-[#39D3C4]">
+                                        {{ $role->name }}
+                                    </span>
+                                @endforeach
+                            </div>
+
+                            <!-- Contact Info -->
+                            <div class="mt-4 w-full bg-gray-50 rounded-xl p-3 border border-gray-100 space-y-2 text-sm text-gray-600">
+                                <div class="flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                    <span class="truncate">{{ $staff->email }}</span>
+                                </div>
+                                <div class="flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                    <span>{{ $staff->phone ?? 'No phone' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                Active
+                            </span>
+                            <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                                Main Clinic
+                            </div>
+                        </div>
+                    </x-ui.card>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
+    <!-- Create Staff Drawer -->
+    <x-ui.drawer id="create-staff-drawer" title="Add New Staff Member">
+        <form id="create-staff-form" method="POST" action="{{ route('staff.store') }}">
+            @csrf
+            
+            <div class="space-y-6">
+                <div class="mb-2">
+                    <p class="text-sm text-gray-500">Personal and account details for the staff member.</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Name -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+                        <input type="text" name="name" id="name" value="{{ old('name') }}" required autofocus class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                    </div>
+
+                    <!-- Email Address -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address <span class="text-red-500">*</span></label>
+                        <input type="email" name="email" id="email" value="{{ old('email') }}" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                    </div>
+                    
+                    <!-- Role -->
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-gray-700 mb-1">System Role <span class="text-red-500">*</span></label>
+                        <select id="role" name="role" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                            <option value="" disabled selected>Select a role...</option>
+                            <option value="Clinic Owner">Doctor / Clinic Owner</option>
+                            <option value="Secretary">Secretary / Receptionist</option>
+                            <option value="Dentist">Dentist</option>
+                            <option value="Assistant">Assistant</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-6 mb-2 border-t border-gray-200 pt-4">
+                    <p class="text-sm font-medium text-gray-900 mb-1">Security</p>
+                    <p class="text-xs text-gray-500">Set the initial password for this staff member.</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password <span class="text-red-500">*</span></label>
+                        <input type="password" name="password" id="password" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password <span class="text-red-500">*</span></label>
+                        <input type="password" name="password_confirmation" id="password_confirmation" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                    </div>
                 </div>
             </div>
+        </form>
 
-        </div>
-    </div>
+        <x-slot name="footer">
+            <x-ui.button variant="secondary" x-on:click="show = false">Cancel</x-ui.button>
+            <x-ui.button variant="primary" x-on:click="document.getElementById('create-staff-form').submit()">Save Staff</x-ui.button>
+        </x-slot>
+    </x-ui.drawer>
 </x-app-layout>

@@ -22,7 +22,11 @@ class PrescriptionController extends Controller
                     ->orderBy('created_at', 'desc')
                     ->paginate(15);
                             
-        return view('prescriptions.index', compact('prescriptions'));
+        // For Create Drawer
+        $patients = Patient::where('organization_id', $org_id)->orderBy('first_name')->get();
+        $dentists = User::where('organization_id', $org_id)->orderBy('name')->get();
+
+        return view('prescriptions.index', compact('prescriptions', 'patients', 'dentists'));
     }
 
     /**

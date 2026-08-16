@@ -1,8 +1,14 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Reception Dashboard') }} - {{ $organization->name ?? 'Clinic' }}
+    <x-slot name="header_title">
+        <h2 class="font-bold text-2xl text-gray-900 leading-tight">
+            {{ __('Reception Dashboard') }}
         </h2>
+    </x-slot>
+
+    <x-slot name="header_actions">
+        <div class="text-sm text-gray-500 font-medium">
+            {{ $organization->name ?? 'Clinic' }}
+        </div>
     </x-slot>
 
     <div class="py-8">

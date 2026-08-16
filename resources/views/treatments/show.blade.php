@@ -105,17 +105,17 @@
                     <div class="space-y-4">
                         <div class="flex items-center justify-between pb-4 border-b border-gray-800">
                             <span class="text-sm text-gray-400">Total Estimated Cost</span>
-                            <span class="text-lg font-bold">${{ number_format($treatmentPlan->total_estimated_cost, 2) }}</span>
+                            <span class="text-lg font-bold">{{ format_currency($treatmentPlan->total_estimated_cost) }}</span>
                         </div>
                         
                         <div class="flex items-center justify-between pb-4 border-b border-gray-800">
                             <span class="text-sm text-gray-400">Amount Paid</span>
-                            <span class="text-lg font-bold text-emerald-400">${{ number_format($treatmentPlan->amount_paid ?? 0, 2) }}</span>
+                            <span class="text-lg font-bold text-emerald-400">{{ format_currency($treatmentPlan->amount_paid ?? 0) }}</span>
                         </div>
                         
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-medium text-white">Remaining Balance</span>
-                            <span class="text-xl font-bold text-white">${{ number_format($treatmentPlan->total_estimated_cost - ($treatmentPlan->amount_paid ?? 0), 2) }}</span>
+                            <span class="text-xl font-bold text-white">{{ format_currency($treatmentPlan->total_estimated_cost - ($treatmentPlan->amount_paid ?? 0)) }}</span>
                         </div>
                     </div>
 

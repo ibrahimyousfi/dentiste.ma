@@ -567,7 +567,7 @@
                                             $totalPaid += $inv->payments->sum('amount');
                                         }
                                     @endphp
-                                    <span class="text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1 rounded-lg">Total Paid: <strong class="text-gray-900">${{ number_format($totalPaid, 2) }}</strong></span>
+                                    <span class="text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1 rounded-lg">Total Paid: <strong class="text-gray-900">{{ format_currency($totalPaid) }}</strong></span>
                                 </h3>
                                 
                                 @if($patient->invoices->count() > 0)
@@ -580,7 +580,7 @@
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                                                     </div>
                                                     <div>
-                                                        <p class="font-bold text-gray-900">${{ number_format($payment->amount, 2) }} <span class="text-xs font-normal text-gray-500 uppercase ml-2 bg-gray-200 px-2 py-0.5 rounded-full">{{ str_replace('_', ' ', $payment->payment_method) }}</span></p>
+                                                        <p class="font-bold text-gray-900">{{ format_currency($payment->amount) }} <span class="text-xs font-normal text-gray-500 uppercase ml-2 bg-gray-200 px-2 py-0.5 rounded-full">{{ str_replace('_', ' ', $payment->payment_method) }}</span></p>
                                                         <p class="text-xs text-gray-500 mt-1">{{ \Carbon\Carbon::parse($payment->payment_date)->format('M d, Y') }} &bull; {{ $payment->notes ?? 'No notes' }}</p>
                                                     </div>
                                                 </div>

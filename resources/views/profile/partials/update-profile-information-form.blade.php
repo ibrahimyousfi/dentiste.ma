@@ -46,6 +46,16 @@
                 </div>
             @endif
         </div>
+        
+        <div>
+            <x-input-label for="language" :value="__('Language (Interface)')" />
+            <select id="language" name="language" class="mt-1 block w-full border-gray-300 focus:border-[#39D3C4] focus:ring-[#39D3C4] rounded-md shadow-sm">
+                <option value="en" @selected(old('language', $user->language) == 'en')>English</option>
+                <option value="fr" @selected(old('language', $user->language) == 'fr')>Français (French)</option>
+                <option value="ar" @selected(old('language', $user->language) == 'ar')>العربية (Arabic)</option>
+            </select>
+            <x-input-error class="mt-2" :messages="$errors->get('language')" />
+        </div>
 
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>

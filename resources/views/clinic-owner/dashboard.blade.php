@@ -63,10 +63,10 @@
                         </div>
                         <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Monthly Revenue</span>
                     </div>
-                    <h3 class="text-3xl font-extrabold text-gray-900">${{ number_format($monthlyRevenue, 2) }}</h3>
+                    <h3 class="text-3xl font-extrabold text-gray-900">{{ format_currency($monthlyRevenue) }}</h3>
                     <p class="text-sm font-medium text-green-500 mt-2 flex items-center justify-between">
                         <span>This Month</span>
-                        <span class="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-lg">Total: ${{ number_format($totalRevenue, 2) }}</span>
+                        <span class="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-lg">Total: {{ format_currency($totalRevenue) }}</span>
                     </p>
                 </div>
 

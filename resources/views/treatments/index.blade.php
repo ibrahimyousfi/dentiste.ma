@@ -131,13 +131,13 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Estimated</div>
-                                    <div class="text-sm font-bold text-gray-900">${{ number_format($plan->total_estimated_cost, 2) }}</div>
+                                    <div class="text-sm font-bold text-gray-900">{{ format_currency($plan->total_estimated_cost) }}</div>
                                 </div>
                                 <div class="text-right">
                                     <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Paid / Remaining</div>
                                     <div class="text-sm font-medium text-gray-500">
-                                        <span class="text-emerald-600 font-bold">${{ number_format($plan->amount_paid ?? 0, 2) }}</span> / 
-                                        <span class="text-rose-500 font-bold">${{ number_format($plan->total_estimated_cost - ($plan->amount_paid ?? 0), 2) }}</span>
+                                        <span class="text-emerald-600 font-bold">{{ format_currency($plan->amount_paid ?? 0) }}</span> / 
+                                        <span class="text-rose-500 font-bold">{{ format_currency($plan->total_estimated_cost - ($plan->amount_paid ?? 0)) }}</span>
                                     </div>
                                 </div>
                             </div>

@@ -67,7 +67,7 @@
             <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center justify-between mb-4">
                 <div>
                     <span class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Remaining Balance</span>
-                    <span class="text-xl font-bold text-gray-900">${{ number_format($plan->total_estimated_cost - ($plan->amount_paid ?? 0), 2) }}</span>
+                    <span class="text-xl font-bold text-gray-900">{{ format_currency($plan->total_estimated_cost - ($plan->amount_paid ?? 0)) }}</span>
                 </div>
             </div>
 

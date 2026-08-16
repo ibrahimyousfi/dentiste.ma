@@ -26,7 +26,12 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        $request->validate([
+            'language' => ['required', 'string', 'in:en,fr,ar'],
+        ]);
+
         $request->user()->fill($request->validated());
+        $request->user()->language = $request->language;
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
@@ -55,6 +60,7 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        return Redirect::to('/');
     }
 
     /**
@@ -72,12 +78,18 @@ class ProfileController extends Controller
             'phone' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string', 'max:1000'],
             'logo' => ['nullable', 'image', 'max:2048'], // max 2MB
+            'currency' => ['required', 'string', 'in:USD,EUR,MAD,GBP,CAD,AUD,AED,SAR'],
+            'timezone' => ['required', 'string'],
+            'date_format' => ['required', 'string', 'in:Y-m-d,d/m/Y,m/d/Y'],
         ]);
 
         $organization = $user->organization;
         $organization->name = $request->name;
         $organization->phone = $request->phone;
         $organization->address = $request->address;
+        $organization->currency = $request->currency;
+        $organization->timezone = $request->timezone;
+        $organization->date_format = $request->date_format;
 
         if ($request->hasFile('logo')) {
             $path = $request->file('logo')->store('clinic_logos', 'public');

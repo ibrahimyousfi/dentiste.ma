@@ -87,7 +87,7 @@
                         </div>
                         <div class="flex justify-between items-center pb-4 border-b border-[#334155]">
                             <span class="text-slate-400">Gross Processed Volume</span>
-                            <span class="text-xl font-bold text-emerald-400">${{ number_format($organization->payments->sum('amount'), 2) }}</span>
+                            <span class="text-xl font-bold text-emerald-400">{{ format_currency($organization->payments->sum('amount')) }}</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-slate-400">Member Since</span>

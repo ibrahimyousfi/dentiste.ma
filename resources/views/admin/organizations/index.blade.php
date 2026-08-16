@@ -91,7 +91,7 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-bold text-emerald-400">${{ number_format($org->payments_sum_amount ?? 0, 2) }}</div>
+                                    <div class="text-sm font-bold text-emerald-400">{{ format_currency($org->payments_sum_amount ?? 0) }}</div>
                                     <div class="text-xs text-slate-500">Gross Revenue</div>
                                 </td>
                                 <td class="px-6 py-4 text-right">

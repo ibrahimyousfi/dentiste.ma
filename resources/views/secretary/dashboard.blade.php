@@ -34,7 +34,7 @@
                     </div>
                     <div class="z-10">
                         <h4 class="text-sm font-bold text-yellow-100 uppercase tracking-wider">Today's Revenue</h4>
-                        <p class="text-4xl font-extrabold mt-1">${{ number_format($todaysRevenue, 2) }}</p>
+                        <p class="text-4xl font-extrabold mt-1">{{ format_currency($todaysRevenue) }}</p>
                         <p class="text-sm text-yellow-100 mt-1 flex items-center">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             {{ $todaysPaymentsCount }} payments collected

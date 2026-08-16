@@ -20,7 +20,15 @@ class Appointment extends Model
         'start_time',
         'end_time',
         'status',
-        'notes'
+        'notes',
+        'reminder_sent_at',
+    ];
+
+    protected $casts = [
+        'appointment_date' => 'date',
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
+        'reminder_sent_at' => 'datetime',
     ];
 
     public function organization()

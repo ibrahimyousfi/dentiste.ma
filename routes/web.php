@@ -57,6 +57,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Clinic Owner Staff Management
     Route::middleware('can:manage clinic staff')->prefix('clinic')->group(function () {
         Route::resource('staff', App\Http\Controllers\StaffController::class)->except(['show']);
+        
+        // Subscription & Billing
+        Route::get('/subscription', [App\Http\Controllers\SubscriptionController::class, 'index'])->name('clinic.subscription');
+        Route::post('/subscription/checkout', [App\Http\Controllers\SubscriptionController::class, 'checkout'])->name('clinic.subscription.checkout');
     });
 
     // Secretary Dashboard

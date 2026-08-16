@@ -46,6 +46,22 @@
                     <label for="clinical_notes-{{ $plan->id }}" class="block text-sm font-medium text-gray-700 mb-1">Session Notes</label>
                     <textarea id="clinical_notes-{{ $plan->id }}" name="clinical_notes" rows="4" placeholder="Record what was done during this session..." class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm"></textarea>
                 </div>
+
+                @php
+                    $org_id = auth()->user()->organization_id ?? 1;
+                    $treatmentCatalogs = \App\Models\TreatmentCatalog::where('organization_id', $org_id)->orderBy('name')->get();
+                @endphp
+                <div>
+                    <label for="treatments_performed-{{ $plan->id }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        Treatments Performed <span class="text-xs text-gray-500 font-normal">(Auto-deducts inventory)</span>
+                    </label>
+                    <select multiple name="treatments_performed[]" id="treatments_performed-{{ $plan->id }}" class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm h-32">
+                        @foreach($treatmentCatalogs as $tc)
+                            <option value="{{ $tc->id }}">{{ $tc->name }}</option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</p>
+                </div>
             </div>
         </div>
     </form>

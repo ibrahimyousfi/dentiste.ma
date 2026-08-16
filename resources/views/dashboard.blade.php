@@ -99,28 +99,33 @@
                     Inventory Alerts
                 </h3>
                 
+                @php
+                    $org_id = auth()->user()->organization_id ?? 1;
+                    $lowStockItems = \App\Models\InventoryItem::where('organization_id', $org_id)
+                                        ->whereColumn('current_stock', '<=', 'minimum_stock')
+                                        ->orderBy('current_stock')
+                                        ->take(5)
+                                        ->get();
+                @endphp
+                
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-xl border border-red-100">
-                        <div>
-                            <p class="text-sm font-bold text-gray-900">Composite Resin (A2)</p>
-                            <p class="text-xs text-red-600 font-medium">Only 2 syringes left</p>
+                    @forelse($lowStockItems as $item)
+                        @php $isOut = $item->current_stock == 0; @endphp
+                        <div class="flex items-center justify-between p-3 {{ $isOut ? 'bg-red-50 border-red-100' : 'bg-yellow-50 border-yellow-100' }} rounded-xl border">
+                            <div>
+                                <p class="text-sm font-bold text-gray-900">{{ $item->name }}</p>
+                                <p class="text-xs {{ $isOut ? 'text-red-600' : 'text-yellow-600' }} font-medium">
+                                    {{ $isOut ? 'Out of stock!' : 'Running low (' . $item->current_stock . ' ' . $item->unit . ' left)' }}
+                                </p>
+                            </div>
+                            <a href="{{ route('inventory.index') }}" class="text-xs font-bold {{ $isOut ? 'text-red-700 bg-red-200 hover:bg-red-300' : 'text-yellow-700 bg-yellow-200 hover:bg-yellow-300' }} px-2 py-1 rounded transition">Restock</a>
                         </div>
-                        <button class="text-xs font-bold text-red-700 bg-red-200 px-2 py-1 rounded hover:bg-red-300 transition">Restock</button>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-xl border border-red-100">
-                        <div>
-                            <p class="text-sm font-bold text-gray-900">Lidocaine 2%</p>
-                            <p class="text-xs text-red-600 font-medium">Out of stock!</p>
+                    @empty
+                        <div class="text-center py-4">
+                            <svg class="w-8 h-8 text-green-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <p class="text-sm font-medium text-gray-500">Stock levels are healthy</p>
                         </div>
-                        <button class="text-xs font-bold text-red-700 bg-red-200 px-2 py-1 rounded hover:bg-red-300 transition">Restock</button>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-xl border border-yellow-100">
-                        <div>
-                            <p class="text-sm font-bold text-gray-900">Surgical Masks</p>
-                            <p class="text-xs text-yellow-600 font-medium">Running low (1 Box)</p>
-                        </div>
-                        <button class="text-xs font-bold text-yellow-700 bg-yellow-200 px-2 py-1 rounded hover:bg-yellow-300 transition">Restock</button>
-                    </div>
+                    @endforelse
                 </div>
                 
                 <a href="#" class="block text-center mt-6 text-sm font-bold text-[#39D3C4] hover:underline">View Full Inventory</a>

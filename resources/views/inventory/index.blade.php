@@ -49,7 +49,7 @@
             <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
                 <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Est. Inventory Value</p>
                 <div class="flex items-end">
-                    <span class="text-3xl font-bold text-gray-900">$12,450</span>
+                    <span class="text-3xl font-bold text-gray-900">{!! format_currency(12450) !!}</span>
                 </div>
             </div>
         </div>
@@ -143,7 +143,7 @@
                                 <div class="text-right">
                                     <div class="font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Unit Cost</div>
                                     <div class="font-bold text-gray-900">
-                                        ${{ $item->cost_per_unit ?? '0.00' }}
+                                        {!! format_currency($item->cost_per_unit ?? 0) !!}
                                     </div>
                                 </div>
                             </div>

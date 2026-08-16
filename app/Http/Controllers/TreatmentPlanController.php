@@ -156,6 +156,8 @@ class TreatmentPlanController extends Controller
         $validated = $request->validate([
             'session_date' => 'required|date',
             'clinical_notes' => 'nullable|string',
+            'treatments_performed' => 'nullable|array',
+            'treatments_performed.*' => 'exists:treatment_catalogs,id'
         ]);
 
         $treatmentPlan->sessions()->create([
@@ -167,7 +169,36 @@ class TreatmentPlanController extends Controller
             'status' => 'completed',
         ]);
 
-        return redirect()->back()->with('success', 'Treatment session added successfully.');
+        // Process Inventory Deduction
+        if (!empty($validated['treatments_performed'])) {
+            $treatments = \App\Models\TreatmentCatalog::with('inventoryItems')
+                ->whereIn('id', $validated['treatments_performed'])
+                ->get();
+                
+            foreach ($treatments as $treatment) {
+                foreach ($treatment->inventoryItems as $item) {
+                    $qtyToDeduct = $item->pivot->quantity_consumed ?? 1;
+                    
+                    // Prevent negative stock but deduct what we can
+                    $actualDeduction = min($item->current_stock, $qtyToDeduct);
+                    
+                    if ($actualDeduction > 0) {
+                        $item->decrement('current_stock', $actualDeduction);
+                        
+                        \App\Models\InventoryLog::create([
+                            'organization_id' => $org_id,
+                            'inventory_item_id' => $item->id,
+                            'user_id' => auth()->id(),
+                            'action' => 'Used',
+                            'quantity' => -$actualDeduction,
+                            'notes' => "Auto-deducted for treatment: {$treatment->name} on patient {$treatmentPlan->patient->first_name}",
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Treatment session added and inventory updated.');
     }
 
     /**

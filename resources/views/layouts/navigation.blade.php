@@ -93,14 +93,6 @@
                     <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Staff Management</span>
                 </a>
-                
-                <!-- Subscription & Billing -->
-                <a href="{{ route('clinic.subscription') }}" 
-                   class="flex items-center px-3 py-3 rounded-xl transition-colors {{ request()->routeIs('clinic.subscription*') ? 'bg-[#39D3C4]/10 text-[#39D3C4]' : 'text-gray-600 hover:bg-gray-50 hover:text-[#39D3C4]' }}"
-                   title="Subscription">
-                    <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                    <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Subscription</span>
-                </a>
             @endhasrole
 
             <div x-show="sidebarOpen" class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Operations</div>
@@ -145,42 +137,66 @@
         </nav>
     </div>
 
-    <!-- Bottom Settings / Profile / Logout -->
-    <div class="p-4 border-t border-gray-200 bg-gray-50 flex flex-col gap-2 shrink-0">
-        <!-- User Info -->
-        <div x-show="sidebarOpen" class="flex items-center space-x-3 mb-2 px-2">
-            <div class="h-10 w-10 rounded-full bg-[#39D3C4]/20 text-[#39D3C4] flex items-center justify-center font-bold text-lg shrink-0">
-                {{ substr(Auth::user()->name, 0, 1) }}
-            </div>
-            <div class="flex-1 min-w-0 overflow-hidden">
-                <p class="text-sm font-semibold text-gray-900 truncate">{{ Auth::user()->name }}</p>
-                <p class="text-xs text-gray-500 truncate">{{ Auth::user()->roles->pluck('name')->first() ?? 'User' }}</p>
+    <!-- Bottom Profile Dropdown -->
+    <div class="p-4 border-t border-gray-200 bg-gray-50 shrink-0 relative" x-data="{ profileMenuOpen: false }" @click.away="profileMenuOpen = false">
+        
+        <!-- Dropdown Menu (Appears above the profile button) -->
+        <div x-show="profileMenuOpen" 
+             x-transition:enter="transition ease-out duration-100"
+             x-transition:enter-start="transform opacity-0 scale-95 translate-y-2"
+             x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-75"
+             x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="transform opacity-0 scale-95 translate-y-2"
+             class="absolute bottom-full left-0 w-full mb-2 px-2 z-50"
+             style="display: none;">
+             
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 py-2 w-full overflow-hidden">
+                <!-- User Info Header in Dropdown -->
+                <div class="px-4 py-3 border-b border-gray-100">
+                    <p class="text-sm font-semibold text-gray-900 truncate">{{ Auth::user()->name }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
+                </div>
+
+                <a href="{{ route('profile.edit') }}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#39D3C4] transition-colors">
+                    <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    Profile & Settings
+                </a>
+
+                @hasrole('Clinic Owner')
+                <a href="{{ route('clinic.subscription') }}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#39D3C4] transition-colors">
+                    <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                    Subscription & Billing
+                </a>
+                @endhasrole
+                
+                <div class="border-t border-gray-100 my-1"></div>
+                
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    @csrf
+                    <button type="submit" class="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left">
+                        <svg class="w-4 h-4 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        Log Out
+                    </button>
+                </form>
             </div>
         </div>
 
-        <!-- Collapsed User Avatar -->
-        <div x-show="!sidebarOpen" class="flex justify-center mb-2">
-            <div class="h-10 w-10 rounded-full bg-[#39D3C4]/20 text-[#39D3C4] flex items-center justify-center font-bold text-lg" title="{{ Auth::user()->name }}">
-                {{ substr(Auth::user()->name, 0, 1) }}
+        <!-- Trigger Button -->
+        <button @click="profileMenuOpen = !profileMenuOpen" class="w-full flex items-center justify-between hover:bg-gray-100 p-2 rounded-xl transition-colors text-left" :class="!sidebarOpen ? 'justify-center' : ''">
+            <div class="flex items-center space-x-3 w-full" :class="!sidebarOpen ? 'justify-center' : ''">
+                <div class="h-10 w-10 rounded-full bg-[#39D3C4]/20 text-[#39D3C4] flex items-center justify-center font-bold text-lg shrink-0" title="{{ Auth::user()->name }}">
+                    {{ substr(Auth::user()->name, 0, 1) }}
+                </div>
+                <div x-show="sidebarOpen" class="flex-1 min-w-0 overflow-hidden">
+                    <p class="text-sm font-semibold text-gray-900 truncate">{{ Auth::user()->name }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ Auth::user()->roles->pluck('name')->first() ?? 'User' }}</p>
+                </div>
             </div>
-        </div>
-
-        <a href="{{ route('profile.edit') }}" 
-           class="flex items-center px-3 py-2 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
-           title="Settings">
-            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-            <span x-show="sidebarOpen" class="ml-3 font-medium text-sm whitespace-nowrap">Profile & Settings</span>
-        </a>
-
-        <!-- Logout -->
-        <form method="POST" action="{{ route('logout') }}" class="w-full">
-            @csrf
-            <button type="submit" 
-               class="flex items-center w-full px-3 py-2 rounded-xl text-red-500 hover:bg-red-50 transition-colors"
-               title="Log Out">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                <span x-show="sidebarOpen" class="ml-3 font-medium text-sm whitespace-nowrap">Log Out</span>
-            </button>
-        </form>
+            
+            <svg x-show="sidebarOpen" class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" :class="{ 'transform rotate-180': profileMenuOpen }">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+            </svg>
+        </button>
     </div>
 </aside>

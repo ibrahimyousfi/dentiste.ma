@@ -32,6 +32,42 @@ class ClinicOwnerDashboardController extends Controller
             
         $recentPatients = \App\Models\Patient::where('organization_id', $organization->id)->latest()->take(5)->get();
 
+        // Analytics Data: Revenue Trend (Last 6 Months)
+        $revenueLabels = [];
+        $revenueValues = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $revenueLabels[] = $month->format('M');
+            $revenueValues[] = \App\Models\Payment::where('organization_id', $organization->id)
+                ->whereMonth('payment_date', $month->month)
+                ->whereYear('payment_date', $month->year)
+                ->sum('amount');
+        }
+
+        // Analytics Data: Appointments Breakdown (This Month)
+        $appointmentStatusCounts = \App\Models\Appointment::whereMonth('appointment_date', now()->month)
+            ->whereYear('appointment_date', now()->year)
+            ->selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
+            
+        $appointmentLabels = array_keys($appointmentStatusCounts);
+        $appointmentValues = array_values($appointmentStatusCounts);
+        if (empty($appointmentLabels)) {
+             $appointmentLabels = ['No Data'];
+             $appointmentValues = [0];
+        }
+
+        // Analytics Data: Patient Growth (Last 6 Months)
+        $patientGrowthValues = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $patientGrowthValues[] = \App\Models\Patient::whereMonth('created_at', $month->month)
+                ->whereYear('created_at', $month->year)
+                ->count();
+        }
+
         return view('clinic-owner.dashboard', compact(
             'user', 
             'organization', 
@@ -40,7 +76,12 @@ class ClinicOwnerDashboardController extends Controller
             'todayAppointments', 
             'totalRevenue',
             'monthlyRevenue',
-            'recentPatients'
+            'recentPatients',
+            'revenueLabels',
+            'revenueValues',
+            'appointmentLabels',
+            'appointmentValues',
+            'patientGrowthValues'
         ));
     }
 }

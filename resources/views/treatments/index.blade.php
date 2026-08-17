@@ -1,10 +1,4 @@
 <x-app-layout>
-    <x-slot name="header_title">
-        <h2 class="font-bold text-xl text-gray-800 leading-tight tracking-tight">
-            {{ __('Treatment Plans') }}
-        </h2>
-    </x-slot>
-
     <x-slot name="header_search">
         <x-ui.search placeholder="Search treatments..." />
     </x-slot>
@@ -12,51 +6,13 @@
     <x-slot name="header_actions">
         <x-ui.button variant="primary" x-data x-on:click="$dispatch('open-drawer', 'create-treatment-plan-drawer')">
             <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-            Propose Plan
+            New
         </x-ui.button>
     </x-slot>
 
     <div class="animate-fade-in space-y-6 pb-10">
         
-        <!-- Metric Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Proposed Plans -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden group">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Proposed</p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-gray-900">{{ $proposedCount }}</span>
-                    <span class="ml-2 text-sm font-medium text-gray-500 mb-1">Awaiting approval</span>
-                </div>
-            </div>
 
-            <!-- Accepted/Active Plans -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border-l-4 border-l-blue-500 border-t border-b border-r border-gray-100 relative overflow-hidden">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center">
-                    <span class="relative flex h-3 w-3 mr-2">
-                        @if($acceptedCount > 0)
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                        @endif
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                    </span>
-                    Active & Accepted
-                </p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-blue-600">{{ $acceptedCount }}</span>
-                    <span class="ml-2 text-sm font-medium text-gray-500 mb-1">In progress</span>
-                </div>
-            </div>
-
-            <!-- Completed Plans -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Completed</p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-gray-900">{{ $completedCount }}</span>
-                    <span class="ml-2 text-sm font-medium text-green-500 flex items-center mb-1">
-                        Successfully finished
-                    </span>
-                </div>
-            </div>
-        </div>
 
         <!-- Treatment Plans Grid -->
         @if($plans->isEmpty())

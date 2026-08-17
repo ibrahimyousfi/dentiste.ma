@@ -87,6 +87,27 @@
                 </div>
             </div>
 
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+            <!-- Analytics & Trends Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Revenue Trend (Line Chart) -->
+                <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 relative overflow-hidden group hover:shadow-md transition-all">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Revenue Trend (Last 6 Months)</h3>
+                    <div class="relative h-64 w-full">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Appointments Breakdown (Doughnut Chart) -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 relative overflow-hidden group hover:shadow-md transition-all flex flex-col">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Appointments Breakdown</h3>
+                    <div class="relative flex-1 w-full flex items-center justify-center">
+                        <canvas id="appointmentsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Today's Schedule -->
                 <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -181,4 +202,131 @@
 
         </div>
     </div>
+
+    <!-- Chart.js Initialization -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Data from Controller
+            const revenueLabels = @json($revenueLabels);
+            const revenueValues = @json($revenueValues);
+            
+            const appointmentLabels = @json($appointmentLabels).map(l => l.charAt(0).toUpperCase() + l.slice(1).replace('_', ' '));
+            const appointmentValues = @json($appointmentValues);
+            
+            // Common Chart Options
+            Chart.defaults.font.family = "'Inter', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
+            Chart.defaults.color = '#9ca3af'; // gray-400
+
+            // 1. Revenue Line Chart
+            const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+            
+            // Create Gradient
+            const gradient = ctxRevenue.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(57, 211, 196, 0.4)'); // Primary color with opacity
+            gradient.addColorStop(1, 'rgba(57, 211, 196, 0.0)');
+
+            new Chart(ctxRevenue, {
+                type: 'line',
+                data: {
+                    labels: revenueLabels,
+                    datasets: [{
+                        label: 'Revenue',
+                        data: revenueValues,
+                        borderColor: '#39D3C4',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#39D3C4',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4 // Smooth curves
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            padding: 12,
+                            titleFont: { size: 13 },
+                            bodyFont: { size: 14, weight: 'bold' },
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f3f4f6', // gray-100
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false,
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. Appointments Doughnut Chart
+            const ctxAppointments = document.getElementById('appointmentsChart').getContext('2d');
+            
+            // Status colors mapped roughly to our UI colors
+            const statusColors = {
+                'Confirmed': '#10b981', // emerald-500
+                'Waiting': '#f59e0b', // amber-500
+                'In progress': '#3b82f6', // blue-500
+                'Completed': '#6b7280', // gray-500
+                'Cancelled': '#ef4444', // red-500
+                'No show': '#8b5cf6', // purple-500
+                'No Data': '#e5e7eb'
+            };
+            
+            const backgroundColors = appointmentLabels.map(label => statusColors[label] || '#39D3C4');
+
+            new Chart(ctxAppointments, {
+                type: 'doughnut',
+                data: {
+                    labels: appointmentLabels,
+                    datasets: [{
+                        data: appointmentValues,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%', // Make it thin and sleek
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                boxWidth: 8
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout>

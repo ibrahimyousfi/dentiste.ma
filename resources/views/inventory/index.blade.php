@@ -1,10 +1,4 @@
 <x-app-layout>
-    <x-slot name="header_title">
-        <h2 class="font-bold text-xl text-gray-800 leading-tight tracking-tight">
-            {{ __('Inventory Management') }}
-        </h2>
-    </x-slot>
-
     <x-slot name="header_search">
         <x-ui.search placeholder="Search products..." />
     </x-slot>
@@ -12,47 +6,11 @@
     <x-slot name="header_actions">
         <x-ui.button variant="primary" x-data x-on:click="$dispatch('open-drawer', 'create-inventory-drawer')">
             <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-            Add Stock Item
+            Add
         </x-ui.button>
     </x-slot>
 
     <div class="animate-fade-in space-y-6 pb-10">
-        
-        <!-- Alerts & Metrics -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Total Items -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Tracked Items</p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-gray-900">{{ $items->total() }}</span>
-                </div>
-            </div>
-
-            <!-- Low Stock Alert -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border-l-4 border-l-red-500 border-t border-b border-r border-gray-100 relative overflow-hidden">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center">
-                    <span class="relative flex h-3 w-3 mr-2">
-                        @if($lowStockCount > 0)
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        @endif
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                    </span>
-                    Low Stock Alerts
-                </p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-red-600">{{ $lowStockCount }}</span>
-                    <span class="ml-2 text-sm font-medium text-gray-500 mb-1">Items below minimum</span>
-                </div>
-            </div>
-
-            <!-- Inventory Value (Mock) -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Est. Inventory Value</p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-gray-900">{!! format_currency(12450) !!}</span>
-                </div>
-            </div>
-        </div>
 
         <!-- Inventory Grid -->
         @if($items->isEmpty())

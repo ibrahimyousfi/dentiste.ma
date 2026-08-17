@@ -13,43 +13,11 @@
 
         <x-ui.button variant="primary" x-data x-on:click="$dispatch('open-drawer', 'create-invoice-drawer')">
             <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-            New Invoice
+            New
         </x-ui.button>
     </x-slot>
 
     <div class="animate-fade-in space-y-6 pb-10">
-        
-        <!-- Metric Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Total Revenue -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden group">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Total Revenue (Month)</p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-gray-900">$24,500</span>
-                    <span class="ml-2 text-sm font-medium text-green-600 mb-1 flex items-center">
-                        <svg class="w-4 h-4 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-                        12%
-                    </span>
-                </div>
-            </div>
-
-            <!-- Pending Receivables -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden group">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Pending / Partial</p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-gray-900">$4,200</span>
-                </div>
-            </div>
-
-            <!-- Overdue -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border-l-4 border-l-red-500 border-t border-b border-r border-gray-100 relative overflow-hidden group">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Overdue Payments</p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-red-600">$1,150</span>
-                    <span class="ml-2 text-sm font-medium text-gray-500 mb-1">From 3 patients</span>
-                </div>
-            </div>
-        </div>
 
         <!-- Invoices Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

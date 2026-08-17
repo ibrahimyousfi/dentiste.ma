@@ -1,14 +1,8 @@
 <x-app-layout>
-    <x-slot name="header_title">
-        <h2 class="font-bold text-xl text-gray-800 leading-tight tracking-tight">
-            {{ __('Appointments Calendar') }}
-        </h2>
-    </x-slot>
-
     <x-slot name="header_actions">
         <x-ui.button variant="primary" type="button" @click="$dispatch('open-appointment-modal')">
             <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            New Appointment
+            New
         </x-ui.button>
     </x-slot>
 

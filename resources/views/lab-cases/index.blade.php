@@ -1,10 +1,4 @@
 <x-app-layout>
-    <x-slot name="header_title">
-        <h2 class="font-bold text-xl text-gray-800 leading-tight tracking-tight">
-            {{ __('Laboratory Orders') }}
-        </h2>
-    </x-slot>
-
     <x-slot name="header_search">
         <x-ui.search placeholder="Search lab cases..." />
     </x-slot>
@@ -12,51 +6,11 @@
     <x-slot name="header_actions">
         <x-ui.button variant="primary" x-data x-on:click="$dispatch('open-drawer', 'create-labcase-drawer')">
             <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-            Send New Case
+            New
         </x-ui.button>
     </x-slot>
 
     <div class="animate-fade-in space-y-6 pb-10">
-        
-        <!-- Metric Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Active Cases -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden group">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Active Cases (Sent)</p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-gray-900">{{ $activeCount }}</span>
-                    <span class="ml-2 text-sm font-medium text-gray-500 mb-1">Awaiting delivery</span>
-                </div>
-            </div>
-
-            <!-- Delayed Cases -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border-l-4 border-l-red-500 border-t border-b border-r border-gray-100 relative overflow-hidden">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center">
-                    <span class="relative flex h-3 w-3 mr-2">
-                        @if($delayedCount > 0)
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        @endif
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                    </span>
-                    Delayed
-                </p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-red-600">{{ $delayedCount }}</span>
-                    <span class="ml-2 text-sm font-medium text-gray-500 mb-1">Past due date</span>
-                </div>
-            </div>
-
-            <!-- Received this Month -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
-                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Received This Month</p>
-                <div class="flex items-end">
-                    <span class="text-3xl font-bold text-gray-900">{{ $receivedMonthCount }}</span>
-                    <span class="ml-2 text-sm font-medium text-green-500 flex items-center mb-1">
-                        Ready for patients
-                    </span>
-                </div>
-            </div>
-        </div>
 
         <!-- Lab Cases Grid -->
         @if($cases->isEmpty())

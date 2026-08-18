@@ -98,5 +98,11 @@
             
         </div>
         @stack('scripts')
+        
+        @auth
+            @if(Auth::user()->organization)
+                <x-ai-copilot />
+            @endif
+        @endauth
     </body>
 </html>

@@ -97,6 +97,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('appointments', AppointmentController::class)->except(['create', 'edit', 'show']);
     Route::patch('appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
     
+    // AI Copilot Routes
+    Route::post('/ai-copilot/chat', [App\Http\Controllers\AiCopilotController::class, 'chat'])->name('ai-copilot.chat');
+    Route::get('/ai-copilot/status', [App\Http\Controllers\AiCopilotController::class, 'status'])->name('ai-copilot.status');
+    
     // Financial Routes
     Route::resource('payments', App\Http\Controllers\PaymentController::class)->only(['store', 'index']);
     

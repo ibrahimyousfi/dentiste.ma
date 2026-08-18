@@ -30,14 +30,59 @@
                 </x-ui.button>
             </x-ui.card>
         @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <x-ui.row-list>
                 @foreach($staffMembers as $staff)
-                    <x-ui.card class="group hover:shadow-md transition-all relative h-full flex flex-col">
-                        <!-- Dropdown Menu for Actions -->
-                        <div class="absolute top-4 right-4 z-10">
+                    <x-ui.row-card>
+                        <!-- Left: Staff Avatar, Name & Roles -->
+                        <div class="flex items-center gap-3.5 min-w-[240px]">
+                            <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#39D3C4]/15 to-blue-500/15 text-gray-800 flex items-center justify-center font-bold text-sm border border-[#39D3C4]/20 shrink-0 shadow-2xs">
+                                {{ substr($staff->name, 0, 2) }}
+                            </div>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-bold text-gray-900 truncate">
+                                        {{ $staff->name }}
+                                    </h3>
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        Active
+                                    </span>
+                                </div>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    @foreach($staff->roles as $role)
+                                        <x-ui.badge variant="teal" size="xs">{{ $role->name }}</x-ui.badge>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Middle 1: Contact Info -->
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-6 min-w-[260px] text-xs text-gray-600">
+                            <div class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                <span class="truncate font-medium text-gray-800">{{ $staff->email }}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                <span class="text-gray-500">{{ $staff->phone ?? 'No phone' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Middle 2: Clinic Assignment -->
+                        <div class="hidden md:block min-w-[120px] text-xs">
+                            <span class="text-gray-400 block text-[10px] uppercase font-semibold">Location</span>
+                            <span class="font-medium text-gray-700">Main Clinic</span>
+                        </div>
+
+                        <!-- Right: Actions -->
+                        <div class="flex items-center gap-2 shrink-0">
+                            <a href="{{ route('staff.edit', $staff->id) }}" class="p-1.5 rounded-lg text-gray-400 hover:text-sky-600 hover:bg-sky-50 transition-colors" title="Edit Profile">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </a>
+
                             <x-dropdown align="right" width="48">
                                 <x-slot name="trigger">
-                                    <button class="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none" title="More Actions">
+                                    <button class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none" title="More Actions">
                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                                     </button>
                                 </x-slot>
@@ -50,7 +95,7 @@
                                         <form action="{{ route('staff.destroy', $staff->id) }}" method="POST" class="w-full">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="block w-full px-4 py-2 text-left text-sm leading-5 text-red-600 hover:bg-red-50 focus:outline-none transition duration-150 ease-in-out" onclick="return confirm('Are you sure you want to deactivate or remove this staff member?');">
+                                            <button type="submit" class="block w-full px-4 py-2 text-left text-sm leading-5 text-rose-600 hover:bg-rose-50 focus:outline-none transition duration-150 ease-in-out" onclick="return confirm('Are you sure you want to deactivate or remove this staff member?');">
                                                 Deactivate / Remove
                                             </button>
                                         </form>
@@ -58,52 +103,9 @@
                                 </x-slot>
                             </x-dropdown>
                         </div>
-
-                        <!-- Card Content -->
-                        <div class="flex flex-col items-center text-center p-2 flex-1">
-                            <!-- Avatar -->
-                            <div class="h-20 w-20 rounded-full bg-gradient-to-br from-[#39D3C4]/20 to-blue-500/20 group-hover:from-[#39D3C4]/30 group-hover:to-blue-500/30 flex items-center justify-center text-gray-700 font-bold text-2xl shadow-sm transition-all border-4 border-white mb-3">
-                                {{ substr($staff->name, 0, 2) }}
-                            </div>
-                            
-                            <!-- Name & Roles -->
-                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-[#39D3C4] transition-colors">
-                                {{ $staff->name }}
-                            </h3>
-                            <div class="mt-1 flex flex-wrap justify-center gap-1">
-                                @foreach($staff->roles as $role)
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#39D3C4]/10 text-[#39D3C4]">
-                                        {{ $role->name }}
-                                    </span>
-                                @endforeach
-                            </div>
-
-                            <!-- Contact Info -->
-                            <div class="mt-4 w-full bg-gray-50 rounded-xl p-3 border border-gray-100 space-y-2 text-sm text-gray-600">
-                                <div class="flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                    <span class="truncate">{{ $staff->email }}</span>
-                                </div>
-                                <div class="flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                                    <span>{{ $staff->phone ?? 'No phone' }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Footer -->
-                        <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                Active
-                            </span>
-                            <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-                                Main Clinic
-                            </div>
-                        </div>
-                    </x-ui.card>
+                    </x-ui.row-card>
                 @endforeach
-            </div>
+            </x-ui.row-list>
         @endif
     </div>
 

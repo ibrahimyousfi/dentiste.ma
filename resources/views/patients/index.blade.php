@@ -43,132 +43,117 @@
                 <p class="text-gray-500 max-w-sm mx-auto">Try adjusting your filters or register a new patient to get started.</p>
             </div>
         @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <x-ui.row-list>
                 @foreach($patients as $patient)
-                    <div class="group relative bg-white rounded-2xl border border-gray-100 p-5 hover:border-gray-200 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 flex flex-col h-full">
-                        <!-- Header Section -->
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="h-11 w-11 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center border border-gray-100 font-semibold text-sm">
-                                    {{ mb_substr($patient->first_name, 0, 1) }}{{ mb_substr($patient->last_name, 0, 1) }}
-                                </div>
-                                <div>
-                                    <a href="{{ route('patients.show', $patient) }}" class="text-base font-semibold text-gray-900 hover:text-black transition-colors line-clamp-1">
+                    <x-ui.row-card>
+                        <!-- Left: Identity & Metadata -->
+                        <div class="flex items-center gap-3.5 min-w-[240px]">
+                            <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#39D3C4]/15 to-[#39D3C4]/5 text-[#2db3a6] flex items-center justify-center font-bold text-sm border border-[#39D3C4]/20 shrink-0 shadow-2xs">
+                                {{ mb_substr($patient->first_name, 0, 1) }}{{ mb_substr($patient->last_name, 0, 1) }}
+                            </div>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('patients.show', $patient) }}" class="text-sm font-bold text-gray-900 hover:text-[#39D3C4] transition-colors truncate">
                                         {{ $patient->first_name }} {{ $patient->last_name }}
                                     </a>
-                                    <div class="flex items-center gap-2 mt-0.5">
-                                        <span class="text-[11px] font-medium text-gray-400">ID: {{ $patient->national_id ?? 'N/A' }}</span>
-                                        <span class="w-1 h-1 rounded-full bg-gray-300"></span>
-                                        <span class="text-[11px] font-medium text-gray-400">
-                                            {{ $patient->date_of_birth ? \Carbon\Carbon::parse($patient->date_of_birth)->age . ' yrs' : 'N/A' }}
-                                        </span>
-                                    </div>
+                                    <x-ui.status-badge :status="$patient->treatment_status" size="xs" />
                                 </div>
-                            </div>
-                            <x-ui.status-badge :status="$patient->treatment_status" />
-                        </div>
-
-                        <!-- Contact & Quick Actions -->
-                        <div class="flex items-center gap-2 mb-6 mt-1">
-                            @if($patient->phone)
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $patient->phone) }}" target="_blank" class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-50 text-gray-400 hover:bg-[#25D366]/10 hover:text-[#25D366] transition-colors" title="WhatsApp">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.012c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-                            </a>
-                            <a href="tel:{{ $patient->phone }}" class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-500 transition-colors" title="Call">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                            </a>
-                            @endif
-                            
-                            @if($patient->email)
-                            <a href="mailto:{{ $patient->email }}" class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors" title="Email">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            </a>
-                            @endif
-                        </div>
-
-                        <!-- Treatment Progress -->
-                        <div class="mb-5 flex-1">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Treatment Sessions</span>
-                                
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-semibold text-gray-900">{{ $patient->total_sessions > 0 ? $patient->completed_sessions . '/' . $patient->total_sessions : '0' }}</span>
-                                    
-                                    @if($patient->total_sessions > 0 && $patient->completed_sessions < $patient->total_sessions)
-                                        <form action="{{ route('patients.increment-session', $patient) }}" method="POST" class="inline">
-                                            @csrf
-                                            <button type="submit" class="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#39D3C4]/10 text-[#39D3C4] border border-[#39D3C4]/20 hover:bg-[#39D3C4] hover:text-white transition-colors shadow-sm" title="Mark session as completed">
-                                                <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                                                Add
-                                            </button>
-                                        </form>
+                                <div class="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
+                                    <span>#{{ $patient->patient_code ?? ($patient->national_id ?? $patient->id) }}</span>
+                                    @if($patient->date_of_birth)
+                                        <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                                        <span>{{ \Carbon\Carbon::parse($patient->date_of_birth)->age }} yrs</span>
+                                    @endif
+                                    @if($patient->gender)
+                                        <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                                        <span>{{ ucfirst($patient->gender) }}</span>
                                     @endif
                                 </div>
                             </div>
-                            @if($patient->total_sessions > 0)
-                                <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                                    @php
-                                        $percentage = ($patient->completed_sessions / $patient->total_sessions) * 100;
-                                        $barColor = $patient->treatment_status === 'completed' ? 'bg-emerald-500' : 'bg-gray-900';
-                                    @endphp
-                                    <div class="h-full {{ $barColor }} rounded-full" style="width: {{ $percentage }}%"></div>
+                        </div>
+
+                        <!-- Middle 1: Contact info & Quick WhatsApp/Call -->
+                        <div class="flex items-center gap-2 min-w-[180px]">
+                            @if($patient->phone)
+                                <span class="text-xs font-medium text-gray-600 font-mono">{{ $patient->phone }}</span>
+                                <div class="flex items-center gap-1 ml-1">
+                                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $patient->phone) }}" target="_blank" class="p-1 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors" title="WhatsApp">
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.012c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                                    </a>
+                                    <a href="tel:{{ $patient->phone }}" class="p-1 rounded-lg text-gray-400 hover:text-sky-600 hover:bg-sky-50 transition-colors" title="Call">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                    </a>
                                 </div>
                             @else
-                                <div x-data="{ showForm: false }" class="relative w-full">
-                                    <button @click="showForm = true" x-show="!showForm" class="w-full inline-flex justify-center items-center px-3 py-1.5 bg-gray-50 rounded-lg text-xs font-medium text-gray-500 hover:bg-gray-100 transition-colors border border-gray-100/50">
-                                        <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                        Start Treatment
-                                    </button>
-                                    <form x-show="showForm" action="{{ route('patients.set-sessions', $patient) }}" method="POST" class="flex items-center gap-2" @click.away="showForm = false" style="display: none;">
+                                <span class="text-xs text-gray-400 italic">No phone recorded</span>
+                            @endif
+                        </div>
+
+                        <!-- Middle 2: Treatment Progress -->
+                        <div class="flex items-center gap-3 min-w-[200px] flex-1 max-w-xs">
+                            @if($patient->total_sessions > 0)
+                                <div class="w-full">
+                                    <div class="flex items-center justify-between text-[11px] font-medium text-gray-500 mb-1">
+                                        <span>Sessions: <strong class="text-gray-800">{{ $patient->completed_sessions }}/{{ $patient->total_sessions }}</strong></span>
+                                        <span>{{ round(($patient->completed_sessions / $patient->total_sessions) * 100) }}%</span>
+                                    </div>
+                                    <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                        <div class="h-full {{ $patient->treatment_status === 'completed' ? 'bg-emerald-500' : 'bg-[#39D3C4]' }} rounded-full transition-all" style="width: {{ ($patient->completed_sessions / $patient->total_sessions) * 100 }}%"></div>
+                                    </div>
+                                </div>
+                                @if($patient->completed_sessions < $patient->total_sessions)
+                                    <form action="{{ route('patients.increment-session', $patient) }}" method="POST" class="shrink-0">
                                         @csrf
-                                        <input type="number" name="total_sessions" min="1" max="100" class="flex-1 py-1 px-2 text-xs border-gray-200 rounded-lg focus:ring-gray-900 focus:border-gray-900 shadow-sm" placeholder="Total sessions..." required autofocus>
-                                        <button type="submit" class="p-1 text-gray-400 hover:text-gray-900 transition-colors">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        <button type="submit" class="p-1 rounded-lg text-gray-400 hover:text-[#39D3C4] hover:bg-[#39D3C4]/10 transition-colors" title="Mark session as completed">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                        </button>
+                                    </form>
+                                @endif
+                            @else
+                                <div x-data="{ showForm: false }" class="w-full">
+                                    <button @click="showForm = true" x-show="!showForm" class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-50 rounded-lg text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors border border-gray-100">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                        Start Plan
+                                    </button>
+                                    <form x-show="showForm" action="{{ route('patients.set-sessions', $patient) }}" method="POST" class="flex items-center gap-1.5" @click.away="showForm = false" style="display: none;">
+                                        @csrf
+                                        <input type="number" name="total_sessions" min="1" max="100" class="w-20 py-0.5 px-2 text-xs border-gray-200 rounded-lg focus:ring-[#39D3C4] focus:border-[#39D3C4]" placeholder="Sessions..." required autofocus>
+                                        <button type="submit" class="p-1 text-gray-400 hover:text-[#39D3C4] transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                         </button>
                                     </form>
                                 </div>
                             @endif
                         </div>
 
-                        <!-- Footer: Next Appt & More Actions -->
-                        <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+                        <!-- Middle 3: Next Appointment -->
+                        <div class="hidden xl:flex items-center gap-2 min-w-[150px] text-xs text-gray-500">
                             @if($patient->appointments->isNotEmpty())
                                 @php $nextAppt = $patient->appointments->first(); @endphp
-                                <div class="flex items-center text-xs text-gray-500">
-                                    <svg class="w-3.5 h-3.5 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    <span class="font-medium text-gray-900">{{ \Carbon\Carbon::parse($nextAppt->appointment_date)->format('M d, g:i A') }}</span>
-                                </div>
+                                <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <span class="font-medium text-gray-700">{{ \Carbon\Carbon::parse($nextAppt->appointment_date)->format('M d, g:i A') }}</span>
                             @else
-                                <div class="text-xs text-gray-400 font-medium">No upcoming appointments</div>
+                                <span class="text-gray-400 text-xs">No appointment</span>
                             @endif
-
-                            <div class="flex items-center gap-1">
-                                <a href="{{ route('patients.show', $patient) }}" class="p-1.5 rounded-md text-gray-400 hover:text-[#39D3C4] hover:bg-gray-50 transition-colors" title="View Profile">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                </a>
-                                
-                                <button x-data @click="$dispatch('open-drawer', 'edit-patient-drawer-{{ $patient->id }}')" class="p-1.5 rounded-md text-gray-400 hover:text-blue-500 hover:bg-gray-50 transition-colors" title="Edit Patient">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </button>
-                                
-                                <a href="#" class="p-1.5 rounded-md text-gray-400 hover:text-indigo-500 hover:bg-gray-50 transition-colors" title="Treatment Plan">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                                </a>
-                                
-                                <a href="#" class="p-1.5 rounded-md text-gray-400 hover:text-emerald-500 hover:bg-gray-50 transition-colors" title="Invoices & Payments">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"></path></svg>
-                                </a>
-
-                                <form action="{{ route('patients.destroy', $patient) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this patient?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-gray-50 transition-colors" title="Delete Patient">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </button>
-                                </form>
-                            </div>
                         </div>
-                    </div>
+
+                        <!-- Right: Actions -->
+                        <div class="flex items-center gap-1 shrink-0">
+                            <a href="{{ route('patients.show', $patient) }}" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors" title="View Patient File">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </a>
+                            <button x-data @click="$dispatch('open-drawer', 'edit-patient-drawer-{{ $patient->id }}')" class="p-1.5 rounded-lg text-gray-400 hover:text-sky-600 hover:bg-sky-50 transition-colors" title="Edit Patient">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </button>
+                            <form action="{{ route('patients.destroy', $patient) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this patient?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Delete Patient">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </x-ui.row-card>
 
                     <!-- Edit Patient Drawer -->
                     <x-ui.drawer id="edit-patient-drawer-{{ $patient->id }}" title="Edit Patient">
@@ -211,7 +196,7 @@
                         </x-slot>
                     </x-ui.drawer>
                 @endforeach
-            </div>
+            </x-ui.row-list>
             
             @if($patients->hasPages())
                 <div class="mt-6">

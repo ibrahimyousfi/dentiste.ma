@@ -25,86 +25,94 @@
                 </x-ui.button>
             </x-ui.card>
         @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <x-ui.row-list>
                 @foreach($cases as $case)
-                    <x-ui.card class="group hover:shadow-md transition-all relative h-full flex flex-col p-5 {{ $case->status == 'delayed' ? 'border-red-200 shadow-sm shadow-red-100' : '' }}">
-                        <!-- Dropdown Menu for Actions -->
-                        <div class="absolute top-4 right-4 z-10">
+                    @php
+                        $isDelayed = $case->status == 'delayed';
+                        $isReceived = $case->status == 'received';
+                        $variant = $isDelayed ? 'danger' : ($isReceived ? 'success' : 'default');
+                    @endphp
+                    <x-ui.row-card :variant="$variant">
+                        <!-- Left: Patient & Doctor -->
+                        <div class="flex items-center gap-3.5 min-w-[220px]">
+                            <div class="h-11 w-11 rounded-2xl {{ $isDelayed ? 'bg-rose-50 text-rose-600 border-rose-200/60' : ($isReceived ? 'bg-emerald-50 text-emerald-600 border-emerald-200/60' : 'bg-indigo-50 text-indigo-600 border-indigo-200/60') }} flex items-center justify-center font-bold text-sm border shrink-0 shadow-2xs">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-bold text-gray-900 truncate">
+                                        {{ $case->patient->first_name }} {{ $case->patient->last_name }}
+                                    </h3>
+                                    <x-ui.badge :variant="$isDelayed ? 'red' : ($isReceived ? 'green' : 'yellow')" dot size="xs">
+                                        {{ $isDelayed ? 'Delayed' : ($isReceived ? 'Received' : 'Pending') }}
+                                    </x-ui.badge>
+                                </div>
+                                <div class="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
+                                    <span>Dr. {{ $case->dentist->name }}</span>
+                                    <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                                    <span>Sent: {{ \Carbon\Carbon::parse($case->sent_date)->format('M d') }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Middle 1: Lab Partner & Work Type -->
+                        <div class="flex items-center gap-2.5 min-w-[200px]">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1.5 text-xs font-semibold text-gray-800">
+                                    <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                                    <span class="truncate">{{ $case->labPartner->name }}</span>
+                                </div>
+                                <div class="mt-0.5">
+                                    <x-ui.badge variant="gray" size="xs">{{ $case->type_of_work ?? 'General Work' }}</x-ui.badge>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Middle 2: Due Date -->
+                        <div class="flex items-center gap-2 min-w-[140px] text-xs">
+                            <div>
+                                <span class="text-gray-400 block text-[10px] uppercase font-semibold">Due Date</span>
+                                <span class="font-bold {{ $isDelayed ? 'text-rose-600' : 'text-gray-800' }}">
+                                    {{ $case->due_date ? \Carbon\Carbon::parse($case->due_date)->format('M d, Y') : 'N/A' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Right: Actions -->
+                        <div class="flex items-center gap-2 shrink-0">
+                            <a href="{{ route('lab-cases.show', $case->id) }}" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors" title="View Details">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </a>
+
+                            <a href="{{ route('lab-cases.edit', $case->id) }}" class="p-1.5 rounded-lg text-gray-400 hover:text-sky-600 hover:bg-sky-50 transition-colors" title="Edit Case">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </a>
+
                             <x-dropdown align="right" width="48">
                                 <x-slot name="trigger">
-                                    <button class="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none" title="More Actions">
+                                    <button class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none" title="More Actions">
                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                                     </button>
                                 </x-slot>
                                 <x-slot name="content">
-                                    <x-dropdown-link href="{{ route('lab-cases.show', $case->id) }}">View Details</x-dropdown-link>
                                     @if($case->status != 'received')
-                                        <x-dropdown-link href="#" class="text-[#39D3C4]">Mark as Received</x-dropdown-link>
+                                        <x-dropdown-link href="#" class="text-[#39D3C4] font-medium">Mark as Received</x-dropdown-link>
                                     @endif
-                                    <x-dropdown-link href="{{ route('lab-cases.edit', $case->id) }}">Edit</x-dropdown-link>
                                     <x-dropdown-link href="#">Contact Lab</x-dropdown-link>
                                     <div class="border-t border-gray-100 my-1"></div>
                                     <form action="{{ route('lab-cases.destroy', $case->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="block w-full px-4 py-2 text-left text-sm leading-5 text-red-600 hover:bg-red-50 focus:outline-none transition duration-150 ease-in-out" onclick="return confirm('Are you sure you want to delete this case?');">
-                                            Delete
+                                        <button type="submit" class="block w-full px-4 py-2 text-left text-sm leading-5 text-rose-600 hover:bg-rose-50 focus:outline-none transition duration-150 ease-in-out" onclick="return confirm('Are you sure you want to delete this case?');">
+                                            Delete Case
                                         </button>
                                     </form>
                                 </x-slot>
                             </x-dropdown>
                         </div>
-
-                        <!-- Header & Status -->
-                        <div class="mb-4 pr-8">
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider 
-                                    {{ $case->status == 'delayed' ? 'bg-red-100 text-red-800' : '' }}
-                                    {{ $case->status == 'received' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ !in_array($case->status, ['delayed', 'received']) ? 'bg-yellow-100 text-yellow-800' : '' }}">
-                                    {{ $case->status == 'delayed' ? 'Delayed' : ($case->status == 'received' ? 'Received' : 'Sent (Pending)') }}
-                                </span>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-[#39D3C4] transition-colors line-clamp-1">
-                                {{ $case->patient->first_name }} {{ $case->patient->last_name }}
-                            </h3>
-                            <div class="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                Dr. {{ $case->dentist->name }}
-                            </div>
-                        </div>
-
-                        <!-- Lab & Work Details -->
-                        <div class="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100 space-y-2 text-sm flex-1">
-                            <div class="flex items-center gap-2 text-gray-700 font-medium">
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                                <span class="truncate">{{ $case->labPartner->name }}</span>
-                            </div>
-                            <div class="flex items-center gap-2 text-gray-500 text-xs">
-                                <span class="font-semibold px-2 py-0.5 bg-white border border-gray-200 rounded">
-                                    {{ $case->type_of_work ?? 'General Work' }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Timeline -->
-                        <div class="mt-auto pt-4 border-t border-gray-100">
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                <div>
-                                    <div class="font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Sent</div>
-                                    <div class="font-medium text-gray-900">{{ \Carbon\Carbon::parse($case->sent_date)->format('M d, Y') }}</div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Due Date</div>
-                                    <div class="font-bold {{ $case->status == 'delayed' ? 'text-red-600' : 'text-gray-900' }}">
-                                        {{ $case->due_date ? \Carbon\Carbon::parse($case->due_date)->format('M d, Y') : 'N/A' }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </x-ui.card>
+                    </x-ui.row-card>
                 @endforeach
-            </div>
+            </x-ui.row-list>
             
             @if($cases->hasPages())
                 <div class="mt-6">

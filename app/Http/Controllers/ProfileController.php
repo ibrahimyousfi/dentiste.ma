@@ -26,12 +26,12 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->validate([
-            'language' => ['required', 'string', 'in:en,fr,ar'],
-        ]);
+        $validated = $request->validated();
+        $request->user()->fill($validated);
 
-        $request->user()->fill($request->validated());
-        $request->user()->language = $request->language;
+        if (isset($validated['language'])) {
+            $request->user()->language = $validated['language'];
+        }
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
@@ -69,7 +69,7 @@ class ProfileController extends Controller
     public function updateClinic(Request $request): RedirectResponse
     {
         $user = $request->user();
-        if (!$user->hasRole('Clinic Owner') || !$user->organization) {
+        if (! $user->hasRole('Clinic Owner') || ! $user->organization) {
             abort(403, 'Unauthorized action.');
         }
 

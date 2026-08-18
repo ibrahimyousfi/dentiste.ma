@@ -3,40 +3,60 @@
     class="bg-white border-r border-gray-200 text-gray-700 flex flex-col transition-all duration-300 ease-in-out z-40 relative shadow-sm"
     :class="sidebarOpen ? 'w-64' : 'w-20'"
 >
-    <!-- Logo Area -->
-    <div class="h-16 flex items-center justify-center border-b border-black/5 shrink-0">
+    <!-- Logo & Toggle Area -->
+    <div class="h-16 flex items-center border-b border-gray-100 px-3 shrink-0">
         @php
             $hasLogo = auth()->check() && auth()->user()->organization && auth()->user()->organization->logo;
             $logoUrl = $hasLogo ? Storage::url(auth()->user()->organization->logo) : null;
             $clinicName = auth()->check() && auth()->user()->organization ? auth()->user()->organization->name : 'Simple Dental';
         @endphp
 
-        <!-- Expanded Logo -->
-        <div x-show="sidebarOpen" class="flex items-center justify-center w-full px-4 h-full py-2">
-            @if($hasLogo)
-                <img src="{{ $logoUrl }}" alt="{{ $clinicName }}" class="h-full w-full object-contain">
-            @else
-                <div class="w-12 h-12 rounded-lg bg-[#39D3C4] flex items-center justify-center text-white font-bold text-2xl">
-                    {{ substr($clinicName, 0, 1) }}
-                </div>
-            @endif
+        <!-- Expanded Logo + Close Button -->
+        <div x-show="sidebarOpen" class="flex items-center justify-between w-full h-full py-2">
+            <div class="flex items-center space-x-3 overflow-hidden">
+                @if($hasLogo)
+                    <img src="{{ $logoUrl }}" alt="{{ $clinicName }}" class="h-9 max-w-[140px] object-contain">
+                @else
+                    <div class="w-9 h-9 rounded-xl bg-[#39D3C4] flex items-center justify-center text-white font-bold text-lg shrink-0 shadow-sm">
+                        {{ substr($clinicName, 0, 1) }}
+                    </div>
+                    <span class="font-bold text-gray-800 text-sm truncate">{{ $clinicName }}</span>
+                @endif
+            </div>
+
+            <!-- Close / Collapse Button Inside Sidebar -->
+            <button 
+                @click="sidebarOpen = false" 
+                class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none shrink-0"
+                title="Fermer la barre latérale"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                </svg>
+            </button>
         </div>
         
-        <!-- Collapsed Logo -->
+        <!-- Collapsed Logo (Click to expand) -->
         <div x-show="!sidebarOpen" class="flex items-center justify-center w-full h-full py-2">
-            @if($hasLogo)
-                <img src="{{ $logoUrl }}" alt="Logo" class="h-full w-full object-contain">
-            @else
-                <div class="w-10 h-10 rounded-lg bg-[#39D3C4] flex items-center justify-center text-white font-bold text-xl">
-                    {{ substr($clinicName, 0, 1) }}
-                </div>
-            @endif
+            <button 
+                @click="sidebarOpen = true" 
+                class="w-full flex items-center justify-center hover:opacity-80 transition-opacity focus:outline-none"
+                title="Ouvrir la barre latérale"
+            >
+                @if($hasLogo)
+                    <img src="{{ $logoUrl }}" alt="Logo" class="h-8 w-8 object-contain">
+                @else
+                    <div class="w-9 h-9 rounded-xl bg-[#39D3C4] flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                        {{ substr($clinicName, 0, 1) }}
+                    </div>
+                @endif
+            </button>
         </div>
     </div>
 
     <!-- Navigation Links -->
     <div class="flex-1 overflow-y-auto py-4 overflow-x-hidden">
-        <nav class="space-y-1 px-2">
+        <nav class="space-y-1.5 px-2">
             
             <!-- Dashboard -->
             <a href="{{ route('dashboard') }}" 
@@ -48,7 +68,6 @@
 
             @if(auth()->user()->hasRole('Super Admin'))
                 <!-- Super Admin Links -->
-                <div x-show="sidebarOpen" class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">System</div>
                 <a href="{{ route('admin.organizations.index') }}" 
                    class="flex items-center px-3 py-3 rounded-xl transition-colors {{ request()->routeIs('admin.organizations.*') ? 'bg-[#39D3C4]/10 text-[#39D3C4]' : 'text-gray-600 hover:bg-gray-50 hover:text-[#39D3C4]' }}"
                    title="Clinics">
@@ -56,8 +75,6 @@
                     <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Clinics</span>
                 </a>
             @else
-            
-                <div x-show="sidebarOpen" class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Clinical</div>
 
             <!-- Patients -->
             <a href="{{ route('patients.index') }}" 
@@ -83,8 +100,6 @@
                     <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-.586-1.414l-4.5-4.5A2 2 0 0012.5 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14z"></path></svg>
                     <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Prescriptions</span>
                 </a>
-                
-                <div x-show="sidebarOpen" class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Administration</div>
 
                 <!-- Staff Management -->
                 <a href="{{ route('staff.index') }}" 
@@ -94,8 +109,6 @@
                     <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Staff Management</span>
                 </a>
             @endhasrole
-
-            <div x-show="sidebarOpen" class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Operations</div>
 
             <!-- Appointments -->
             <a href="{{ route('appointments.index') }}" 
@@ -122,8 +135,6 @@
                     <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Inventory</span>
                 </a>
             @endhasrole
-            
-            <div x-show="sidebarOpen" class="px-4 mt-6 mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Finance</div>
 
             <!-- Invoices & Billing -->
             <a href="{{ route('invoices.index') }}" 

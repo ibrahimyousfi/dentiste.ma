@@ -27,126 +27,103 @@
                 </x-ui.button>
             </x-ui.card>
         @else
-            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <x-ui.row-list>
                 @foreach($plans as $plan)
-                    <x-ui.card class="group hover:shadow-md transition-all relative h-full flex flex-col">
-
-
-                        <!-- Card Header: Treatment Name & Status -->
-                        <div class="mb-4 pr-8">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider 
-                                    {{ $plan->status == 'proposed' ? 'bg-gray-100 text-gray-800' : '' }}
-                                    {{ $plan->status == 'accepted' ? 'bg-blue-100 text-blue-800' : '' }}
-                                    {{ $plan->status == 'completed' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ $plan->status == 'rejected' ? 'bg-red-100 text-red-800' : '' }}">
-                                    {{ $plan->status }}
-                                </span>
-                                <span class="text-xs text-gray-400 font-medium">{{ $plan->created_at ? $plan->created_at->format('M d, Y') : '' }}</span>
+                    <x-ui.row-card>
+                        <!-- Left: Treatment Info & Tooth -->
+                        <div class="flex items-center gap-3.5 min-w-[220px]">
+                            <div class="h-11 w-11 rounded-2xl bg-[#39D3C4]/10 text-[#2db3a6] flex items-center justify-center font-bold text-sm border border-[#39D3C4]/20 shrink-0 shadow-2xs">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                             </div>
-                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-[#39D3C4] transition-colors line-clamp-1">
-                                {{ $plan->name }}
-                            </h3>
-                            <p class="text-xs text-gray-500 mt-1">Tooth: {{ $plan->tooth ?? 'General' }}</p>
-                        </div>
-
-                        <!-- Patient & Doctor Info -->
-                        <div class="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100 space-y-2">
-                            <div class="flex items-center justify-between">
+                            <div class="min-w-0">
                                 <div class="flex items-center gap-2">
-                                    <div class="w-6 h-6 rounded-full bg-[#39D3C4]/10 text-[#39D3C4] flex items-center justify-center text-[10px] font-bold">
-                                        {{ substr($plan->patient->first_name, 0, 1) }}{{ substr($plan->patient->last_name, 0, 1) }}
-                                    </div>
-                                    <a href="{{ route('patients.show', $plan->patient) }}" class="text-sm font-semibold text-gray-700 hover:text-[#39D3C4] transition-colors">
-                                        {{ $plan->patient->first_name }} {{ $plan->patient->last_name }}
+                                    <a href="{{ route('treatment-plans.show', $plan) }}" class="text-sm font-bold text-gray-900 hover:text-[#39D3C4] transition-colors truncate">
+                                        {{ $plan->name }}
                                     </a>
+                                    <x-ui.status-badge :status="$plan->status" size="xs" />
                                 </div>
-                            </div>
-                            <div class="flex items-center gap-2 text-xs text-gray-500">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                Dr. {{ $plan->dentist->name }}
+                                <div class="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
+                                    <span>Tooth: <strong class="text-gray-600 font-medium">{{ $plan->tooth ?? 'General' }}</strong></span>
+                                    <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                                    <span>{{ $plan->created_at ? $plan->created_at->format('M d, Y') : '' }}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Progress Section -->
-                        <div class="mb-4">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Progress</span>
-                                <span class="text-xs font-bold text-gray-900">{{ $plan->completed_sessions ?? 0 }}/{{ $plan->sessions_count ?? 0 }}</span>
+                        <!-- Middle 1: Patient & Dentist -->
+                        <div class="flex items-center gap-2.5 min-w-[180px]">
+                            <div class="w-8 h-8 rounded-full bg-gray-100 text-gray-700 flex items-center justify-center text-xs font-bold shrink-0">
+                                {{ substr($plan->patient->first_name, 0, 1) }}{{ substr($plan->patient->last_name, 0, 1) }}
                             </div>
-                            <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                                @php
-                                    $progress = $plan->sessions_count > 0 ? (($plan->completed_sessions ?? 0) / $plan->sessions_count) * 100 : 0;
-                                @endphp
-                                <div class="h-full bg-[#39D3C4] rounded-full transition-all duration-500" style="width: {{ $progress }}%"></div>
+                            <div class="min-w-0 text-xs">
+                                <a href="{{ route('patients.show', $plan->patient) }}" class="font-semibold text-gray-900 hover:text-[#39D3C4] transition-colors block truncate">
+                                    {{ $plan->patient->first_name }} {{ $plan->patient->last_name }}
+                                </a>
+                                <span class="text-gray-400 truncate block">Dr. {{ $plan->dentist->name }}</span>
                             </div>
                         </div>
 
-                        <!-- Financials -->
-                        <div class="mt-auto pt-4 border-t border-gray-100">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Estimated</div>
-                                    <div class="text-sm font-bold text-gray-900">{{ format_currency($plan->total_estimated_cost) }}</div>
+                        <!-- Middle 2: Progress -->
+                        <div class="flex items-center gap-3 min-w-[180px] flex-1 max-w-xs">
+                            <div class="w-full">
+                                <div class="flex items-center justify-between text-[11px] font-medium text-gray-500 mb-1">
+                                    <span>Sessions: <strong class="text-gray-800">{{ $plan->completed_sessions ?? 0 }}/{{ $plan->sessions_count ?? 0 }}</strong></span>
+                                    @php
+                                        $progress = $plan->sessions_count > 0 ? (($plan->completed_sessions ?? 0) / $plan->sessions_count) * 100 : 0;
+                                    @endphp
+                                    <span>{{ round($progress) }}%</span>
                                 </div>
-                                <div class="text-right">
-                                    <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Paid / Remaining</div>
-                                    <div class="text-sm font-medium text-gray-500">
-                                        <span class="text-emerald-600 font-bold">{{ format_currency($plan->amount_paid ?? 0) }}</span> / 
-                                        <span class="text-rose-500 font-bold">{{ format_currency($plan->total_estimated_cost - ($plan->amount_paid ?? 0)) }}</span>
-                                    </div>
+                                <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#39D3C4] rounded-full transition-all" style="width: {{ $progress }}%"></div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Quick Actions -->
-                        <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
-                            <div class="flex items-center gap-1.5 w-full justify-center">
-                                <a href="{{ route('treatment-plans.show', $plan) }}" class="group relative p-1.5 rounded-md text-gray-400 hover:text-[#39D3C4] hover:bg-gray-50 transition-colors" title="View Plan">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                </a>
-                                
-                                <button x-data x-on:click="$dispatch('open-drawer', 'edit-plan-drawer-{{ $plan->id }}')" class="group relative p-1.5 rounded-md text-gray-400 hover:text-blue-500 hover:bg-gray-50 transition-colors" title="Edit Plan">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </button>
-                                
-                                <form action="{{ route('treatment-plans.update-status', $plan) }}" method="POST" class="inline" title="Continue Treatment (Accept Plan)">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="status" value="accepted">
-                                    <button type="submit" class="group relative p-1.5 rounded-md text-gray-400 hover:text-indigo-500 hover:bg-gray-50 transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    </button>
-                                </form>
-                                
-                                <button x-data x-on:click="$dispatch('open-drawer', 'add-session-drawer-{{ $plan->id }}')" class="group relative p-1.5 rounded-md text-gray-400 hover:text-emerald-500 hover:bg-gray-50 transition-colors" title="Add Session">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </button>
-                                
-                                <button x-data x-on:click="$dispatch('open-drawer', 'add-payment-drawer-{{ $plan->id }}')" class="group relative p-1.5 rounded-md text-gray-400 hover:text-orange-500 hover:bg-gray-50 transition-colors" title="Payment">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                                </button>
-                                
-                                <a href="#" class="group relative p-1.5 rounded-md text-gray-400 hover:text-purple-500 hover:bg-gray-50 transition-colors" title="Documents">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                </a>
-                                
-                                <form action="{{ route('treatment-plans.destroy', $plan) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this treatment plan?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="group relative p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-gray-50 transition-colors" title="Delete Plan">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </button>
-                                </form>
+
+                        <!-- Middle 3: Financials -->
+                        <div class="flex items-center gap-4 min-w-[170px] text-xs">
+                            <div>
+                                <span class="text-gray-400 block text-[10px] uppercase font-semibold">Cost</span>
+                                <span class="font-bold text-gray-900">{{ format_currency($plan->total_estimated_cost) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400 block text-[10px] uppercase font-semibold">Remaining</span>
+                                <span class="font-bold text-rose-500">{{ format_currency($plan->total_estimated_cost - ($plan->amount_paid ?? 0)) }}</span>
                             </div>
                         </div>
-                    </x-ui.card>
+
+                        <!-- Right: Actions -->
+                        <div class="flex items-center gap-1 shrink-0">
+                            <a href="{{ route('treatment-plans.show', $plan) }}" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors" title="View Plan">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </a>
+                            
+                            <button x-data x-on:click="$dispatch('open-drawer', 'edit-plan-drawer-{{ $plan->id }}')" class="p-1.5 rounded-lg text-gray-400 hover:text-sky-600 hover:bg-sky-50 transition-colors" title="Edit Plan">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </button>
+
+                            <button x-data x-on:click="$dispatch('open-drawer', 'add-session-drawer-{{ $plan->id }}')" class="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors" title="Add Session">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </button>
+
+                            <button x-data x-on:click="$dispatch('open-drawer', 'add-payment-drawer-{{ $plan->id }}')" class="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors" title="Add Payment">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                            </button>
+                            
+                            <form action="{{ route('treatment-plans.destroy', $plan) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this treatment plan?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Delete Plan">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </x-ui.row-card>
                     
                     <!-- Include Drawers for this plan -->
                     @include('treatments.partials.drawers', ['plan' => $plan])
                     
                 @endforeach
-            </div>
+            </x-ui.row-list>
             
             @if($plans->hasPages())
                 <div class="mt-6">

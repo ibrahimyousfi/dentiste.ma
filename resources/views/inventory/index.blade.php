@@ -25,90 +25,91 @@
                 </x-ui.button>
             </x-ui.card>
         @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <x-ui.row-list>
                 @foreach($items as $item)
                     @php
                         $isLow = $item->current_stock <= $item->minimum_stock;
                         $isOut = $item->current_stock == 0;
+                        $variant = $isOut ? 'danger' : ($isLow ? 'warning' : 'default');
                     @endphp
-                    <x-ui.card class="group hover:shadow-md transition-all relative h-full flex flex-col p-5 {{ $isOut ? 'border-red-200 shadow-sm shadow-red-100' : ($isLow ? 'border-orange-200 shadow-sm shadow-orange-100' : '') }}">
-                        <!-- Dropdown Menu for Actions -->
-                        <div class="absolute top-4 right-4 z-10">
+                    <x-ui.row-card :variant="$variant">
+                        <!-- Left: Item Name & Category -->
+                        <div class="flex items-center gap-3.5 min-w-[220px]">
+                            <div class="h-11 w-11 rounded-2xl {{ $isOut ? 'bg-rose-50 text-rose-600 border-rose-200/60' : ($isLow ? 'bg-amber-50 text-amber-600 border-amber-200/60' : 'bg-[#39D3C4]/10 text-[#2db3a6] border-[#39D3C4]/20') }} flex items-center justify-center font-bold text-sm border shrink-0 shadow-2xs">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-bold text-gray-900 truncate" title="{{ $item->name }}">
+                                        {{ $item->name }}
+                                    </h3>
+                                    <x-ui.badge :variant="$isOut ? 'red' : ($isLow ? 'amber' : 'green')" dot size="xs">
+                                        {{ $isOut ? 'Out of Stock' : ($isLow ? 'Low Stock' : 'In Stock') }}
+                                    </x-ui.badge>
+                                </div>
+                                <div class="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
+                                    <span>{{ $item->category ?? 'General' }}</span>
+                                    <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                                    <span>Cost: <strong class="text-gray-700 font-semibold">{!! format_currency($item->cost_per_unit ?? 0) !!}</strong></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Middle 1: Stock Level -->
+                        <div class="flex items-center gap-3 min-w-[160px]">
+                            <div>
+                                <span class="text-gray-400 block text-[10px] uppercase font-semibold">Stock Quantity</span>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-xl font-black {{ $isOut ? 'text-rose-600' : ($isLow ? 'text-amber-600' : 'text-gray-900') }}">
+                                        {{ $item->current_stock }}
+                                    </span>
+                                    <span class="text-xs font-semibold text-gray-400">{{ $item->unit }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Middle 2: Threshold & Last update -->
+                        <div class="hidden sm:flex items-center gap-6 min-w-[200px] text-xs">
+                            <div>
+                                <span class="text-gray-400 block text-[10px] uppercase font-semibold">Min Alert</span>
+                                <span class="font-medium text-gray-700">{{ $item->minimum_stock }} {{ $item->unit }}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-400 block text-[10px] uppercase font-semibold">Last Restock</span>
+                                <span class="font-medium text-gray-700">{{ $item->updated_at ? $item->updated_at->format('M d, Y') : 'N/A' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Right: Actions -->
+                        <div class="flex items-center gap-2 shrink-0">
+                            <a href="{{ route('inventory.edit', $item->id) }}" class="p-1.5 rounded-lg text-gray-400 hover:text-sky-600 hover:bg-sky-50 transition-colors" title="Edit Details">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </a>
+
                             <x-dropdown align="right" width="48">
                                 <x-slot name="trigger">
-                                    <button class="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none" title="More Actions">
+                                    <button class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none" title="More Actions">
                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                                     </button>
                                 </x-slot>
                                 <x-slot name="content">
                                     <x-dropdown-link href="#" class="text-[#39D3C4] font-medium">Receive Stock (+)</x-dropdown-link>
-                                    <x-dropdown-link href="#" class="text-orange-600 font-medium">Use Stock (-)</x-dropdown-link>
+                                    <x-dropdown-link href="#" class="text-amber-600 font-medium">Use Stock (-)</x-dropdown-link>
                                     <x-dropdown-link href="{{ route('inventory.edit', $item->id) }}">Edit Details</x-dropdown-link>
                                     <div class="border-t border-gray-100 my-1"></div>
                                     <form action="{{ route('inventory.destroy', $item->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="block w-full px-4 py-2 text-left text-sm leading-5 text-red-600 hover:bg-red-50 focus:outline-none transition duration-150 ease-in-out" onclick="return confirm('Are you sure you want to delete this item?');">
+                                        <button type="submit" class="block w-full px-4 py-2 text-left text-sm leading-5 text-rose-600 hover:bg-rose-50 focus:outline-none transition duration-150 ease-in-out" onclick="return confirm('Are you sure you want to delete this item?');">
                                             Delete Item
                                         </button>
                                     </form>
                                 </x-slot>
                             </x-dropdown>
                         </div>
-
-                        <!-- Header & Status -->
-                        <div class="mb-4 pr-8">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider 
-                                    {{ $isOut ? 'bg-red-100 text-red-800' : ($isLow ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800') }}">
-                                    {{ $isOut ? 'Out of Stock' : ($isLow ? 'Low Stock' : 'In Stock') }}
-                                </span>
-                            </div>
-                            <div class="flex items-start gap-3">
-                                <div class="h-10 w-10 flex-shrink-0 rounded-lg {{ $isLow ? 'bg-red-100 text-red-600' : 'bg-[#39D3C4]/20 text-[#39D3C4]' }} flex items-center justify-center">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-bold text-gray-900 group-hover:text-[#39D3C4] transition-colors line-clamp-1" title="{{ $item->name }}">
-                                        {{ $item->name }}
-                                    </h3>
-                                    <p class="text-xs text-gray-500 font-medium mt-0.5">{{ $item->category ?? 'General' }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Stock Level Details -->
-                        <div class="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100 text-center flex-1">
-                            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Current Stock Level</div>
-                            <div class="text-3xl font-black {{ $isOut ? 'text-red-600' : ($isLow ? 'text-orange-500' : 'text-gray-900') }}">
-                                {{ $item->current_stock }}
-                                <span class="text-sm font-bold text-gray-400 ml-1">{{ $item->unit }}</span>
-                            </div>
-                            <div class="text-xs font-semibold text-gray-500 mt-2">
-                                Minimum threshold: <span class="text-gray-900">{{ $item->minimum_stock }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Footer -->
-                        <div class="mt-auto pt-3 border-t border-gray-100">
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                <div>
-                                    <div class="font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Last Restock</div>
-                                    <div class="font-medium text-gray-900">
-                                        {{ $item->updated_at ? $item->updated_at->format('M d, Y') : 'Unknown' }}
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Unit Cost</div>
-                                    <div class="font-bold text-gray-900">
-                                        {!! format_currency($item->cost_per_unit ?? 0) !!}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </x-ui.card>
+                    </x-ui.row-card>
                 @endforeach
-            </div>
+            </x-ui.row-list>
             
             @if($items->hasPages())
                 <div class="mt-6">

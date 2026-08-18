@@ -19,176 +19,182 @@
 
     <div class="animate-fade-in space-y-6 pb-10">
 
-        <!-- Invoices Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Invoices List -->
+        <x-ui.row-list>
             
-            <!-- Mock Card 1 (Paid) -->
-            <x-ui.card class="group hover:shadow-md transition-all relative h-full flex flex-col p-5">
-                <!-- Dropdown Menu for Actions -->
-                <div class="absolute top-4 right-4 z-10">
+            <!-- Invoice 1 (Paid) -->
+            <x-ui.row-card>
+                <!-- Left: Patient & Invoice ID -->
+                <div class="flex items-center gap-3.5 min-w-[240px]">
+                    <div class="h-11 w-11 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-sm border border-emerald-200/60 shrink-0 shadow-2xs">
+                        JD
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm font-bold text-gray-900 truncate">John Doe</h3>
+                            <x-ui.status-badge status="paid" size="xs" />
+                        </div>
+                        <div class="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
+                            <span class="text-[#39D3C4] font-semibold">#INV-2026-0042</span>
+                            <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                            <span>Aug 08, 2026</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle 1: Amount & Balance -->
+                <div class="flex items-center gap-6 min-w-[200px]">
+                    <div>
+                        <span class="text-gray-400 block text-[10px] uppercase font-semibold">Total</span>
+                        <span class="font-black text-gray-900 text-base">$350.00</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block text-[10px] uppercase font-semibold">Balance Due</span>
+                        <span class="font-bold text-emerald-600 text-sm">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Middle 2: Payment Status Tag -->
+                <div class="hidden sm:flex items-center gap-2 min-w-[140px]">
+                    <x-ui.badge variant="green" dot size="sm">Fully Settled</x-ui.badge>
+                </div>
+
+                <!-- Right: Actions -->
+                <div class="flex items-center gap-2 shrink-0">
+                    <x-ui.button variant="secondary" class="!py-1.5 !px-3 !text-xs">
+                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Print
+                    </x-ui.button>
+
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
-                            <button class="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none" title="More Actions">
+                            <button class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none" title="More Actions">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                             </button>
                         </x-slot>
                         <x-slot name="content">
-                            <x-dropdown-link href="{{ route('dashboard') }}">View / Print</x-dropdown-link>
+                            <x-dropdown-link href="{{ route('dashboard') }}">View Details</x-dropdown-link>
+                            <x-dropdown-link href="#">Download PDF</x-dropdown-link>
                         </x-slot>
                     </x-dropdown>
                 </div>
+            </x-ui.row-card>
 
-                <!-- Header & Status -->
-                <div class="mb-4 pr-8">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-green-100 text-green-800">
-                            Paid
-                        </span>
+            <!-- Invoice 2 (Partial) -->
+            <x-ui.row-card variant="warning">
+                <!-- Left: Patient & Invoice ID -->
+                <div class="flex items-center gap-3.5 min-w-[240px]">
+                    <div class="h-11 w-11 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-sm border border-amber-200/60 shrink-0 shadow-2xs">
+                        SA
                     </div>
-                    <div class="flex items-start gap-3">
-                        <div class="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-700 flex items-center justify-center font-bold text-xs">
-                            JD
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm font-bold text-gray-900 truncate">Sarah Adams</h3>
+                            <x-ui.status-badge status="partial" size="xs" />
                         </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-[#39D3C4] transition-colors line-clamp-1">
-                                John Doe
-                            </h3>
-                            <p class="text-xs text-[#39D3C4] font-bold mt-0.5">#INV-2026-0042</p>
+                        <div class="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
+                            <span class="text-[#39D3C4] font-semibold">#INV-2026-0043</span>
+                            <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                            <span>Aug 07, 2026</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Amount Details -->
-                <div class="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100 text-center flex-1">
-                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Amount</div>
-                    <div class="text-3xl font-black text-gray-900">
-                        $350.00
+                <!-- Middle 1: Amount & Balance -->
+                <div class="flex items-center gap-6 min-w-[200px]">
+                    <div>
+                        <span class="text-gray-400 block text-[10px] uppercase font-semibold">Total</span>
+                        <span class="font-black text-gray-900 text-base">$1,200.00</span>
                     </div>
-                    <div class="text-xs font-semibold text-green-600 mt-2">
-                        Balance: $0.00
+                    <div>
+                        <span class="text-gray-400 block text-[10px] uppercase font-semibold">Balance Due</span>
+                        <span class="font-bold text-amber-600 text-sm">$600.00</span>
                     </div>
                 </div>
 
-                <!-- Footer -->
-                <div class="mt-auto pt-3 border-t border-gray-100 text-center">
-                    <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Invoice Date</div>
-                    <div class="text-sm font-medium text-gray-900">Aug 08, 2026</div>
+                <!-- Middle 2: Tag -->
+                <div class="hidden sm:flex items-center gap-2 min-w-[140px]">
+                    <x-ui.badge variant="amber" dot size="sm">50% Paid</x-ui.badge>
                 </div>
-            </x-ui.card>
 
-            <!-- Mock Card 2 (Partial) -->
-            <x-ui.card class="group hover:shadow-md transition-all relative h-full flex flex-col p-5 border-orange-200 shadow-sm shadow-orange-100">
-                <!-- Dropdown Menu for Actions -->
-                <div class="absolute top-4 right-4 z-10">
+                <!-- Right: Actions -->
+                <div class="flex items-center gap-2 shrink-0">
+                    <x-ui.button variant="primary" class="!py-1.5 !px-3 !text-xs">
+                        Record Payment
+                    </x-ui.button>
+
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
-                            <button class="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none" title="More Actions">
+                            <button class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none" title="More Actions">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                             </button>
                         </x-slot>
                         <x-slot name="content">
-                            <x-dropdown-link href="#" class="text-[#39D3C4] font-medium">Record Payment</x-dropdown-link>
-                            <x-dropdown-link href="#">View / Print</x-dropdown-link>
+                            <x-dropdown-link href="#">View Details</x-dropdown-link>
                             <x-dropdown-link href="#">Send Reminder</x-dropdown-link>
                         </x-slot>
                     </x-dropdown>
                 </div>
+            </x-ui.row-card>
 
-                <!-- Header & Status -->
-                <div class="mb-4 pr-8">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-800">
-                            Partial
-                        </span>
+            <!-- Invoice 3 (Unpaid) -->
+            <x-ui.row-card variant="danger">
+                <!-- Left: Patient & Invoice ID -->
+                <div class="flex items-center gap-3.5 min-w-[240px]">
+                    <div class="h-11 w-11 rounded-2xl bg-rose-50 text-rose-700 flex items-center justify-center font-bold text-sm border border-rose-200/60 shrink-0 shadow-2xs">
+                        MR
                     </div>
-                    <div class="flex items-start gap-3">
-                        <div class="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 text-purple-700 flex items-center justify-center font-bold text-xs">
-                            SA
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm font-bold text-gray-900 truncate">Mike Ross</h3>
+                            <x-ui.status-badge status="unpaid" size="xs" />
+                            <x-ui.badge variant="red" size="xs">Overdue 2d</x-ui.badge>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-[#39D3C4] transition-colors line-clamp-1">
-                                Sarah Adams
-                            </h3>
-                            <p class="text-xs text-[#39D3C4] font-bold mt-0.5">#INV-2026-0043</p>
+                        <div class="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
+                            <span class="text-[#39D3C4] font-semibold">#INV-2026-0044</span>
+                            <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+                            <span>Aug 05, 2026</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Amount Details -->
-                <div class="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100 text-center flex-1">
-                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Amount</div>
-                    <div class="text-3xl font-black text-gray-900">
-                        $1,200.00
+                <!-- Middle 1: Amount & Balance -->
+                <div class="flex items-center gap-6 min-w-[200px]">
+                    <div>
+                        <span class="text-gray-400 block text-[10px] uppercase font-semibold">Total</span>
+                        <span class="font-black text-gray-900 text-base">$450.00</span>
                     </div>
-                    <div class="text-xs font-semibold text-orange-600 mt-2">
-                        Balance Due: $600.00
+                    <div>
+                        <span class="text-gray-400 block text-[10px] uppercase font-semibold">Balance Due</span>
+                        <span class="font-bold text-rose-600 text-sm">$450.00</span>
                     </div>
                 </div>
 
-                <!-- Footer -->
-                <div class="mt-auto pt-3 border-t border-gray-100 text-center">
-                    <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Invoice Date</div>
-                    <div class="text-sm font-medium text-gray-900">Aug 07, 2026</div>
+                <!-- Middle 2: Tag -->
+                <div class="hidden sm:flex items-center gap-2 min-w-[140px]">
+                    <x-ui.badge variant="red" dot size="sm">Action Needed</x-ui.badge>
                 </div>
-            </x-ui.card>
 
-            <!-- Mock Card 3 (Unpaid) -->
-            <x-ui.card class="group hover:shadow-md transition-all relative h-full flex flex-col p-5 border-red-200 shadow-sm shadow-red-100">
-                <!-- Dropdown Menu for Actions -->
-                <div class="absolute top-4 right-4 z-10">
+                <!-- Right: Actions -->
+                <div class="flex items-center gap-2 shrink-0">
+                    <x-ui.button variant="primary" class="!py-1.5 !px-3 !text-xs">
+                        Record Payment
+                    </x-ui.button>
+
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
-                            <button class="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none" title="More Actions">
+                            <button class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none" title="More Actions">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                             </button>
                         </x-slot>
                         <x-slot name="content">
-                            <x-dropdown-link href="#" class="text-[#39D3C4] font-medium">Record Payment</x-dropdown-link>
-                            <x-dropdown-link href="#">View / Print</x-dropdown-link>
-                            <x-dropdown-link href="#" class="text-red-600">Send Urgent Reminder</x-dropdown-link>
+                            <x-dropdown-link href="#" class="text-rose-600">Send Urgent Reminder</x-dropdown-link>
+                            <x-dropdown-link href="#">View Details</x-dropdown-link>
                         </x-slot>
                     </x-dropdown>
                 </div>
-
-                <!-- Header & Status -->
-                <div class="mb-4 pr-8">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-800">
-                            Unpaid
-                        </span>
-                        <span class="text-[10px] font-bold text-red-600">Overdue (2 Days)</span>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <div class="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 flex items-center justify-center font-bold text-xs">
-                            MR
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-[#39D3C4] transition-colors line-clamp-1">
-                                Mike Ross
-                            </h3>
-                            <p class="text-xs text-[#39D3C4] font-bold mt-0.5">#INV-2026-0044</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Amount Details -->
-                <div class="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100 text-center flex-1">
-                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Amount</div>
-                    <div class="text-3xl font-black text-gray-900">
-                        $450.00
-                    </div>
-                    <div class="text-xs font-black text-red-600 mt-2">
-                        Balance Due: $450.00
-                    </div>
-                </div>
-
-                <!-- Footer -->
-                <div class="mt-auto pt-3 border-t border-gray-100 text-center">
-                    <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Invoice Date</div>
-                    <div class="text-sm font-medium text-gray-900">Aug 05, 2026</div>
-                </div>
-            </x-ui.card>
-        </div>
+            </x-ui.row-card>
+        </x-ui.row-list>
     </div>
 
     <!-- Create Invoice Drawer -->

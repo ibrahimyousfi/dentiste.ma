@@ -153,12 +153,9 @@
 
                         <!-- Right: Actions -->
                         <div class="flex items-center gap-1 shrink-0">
-                            <a href="{{ route('patients.show', $patient) }}" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors" title="View Patient File">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <a href="{{ route('patients.show', $patient) }}" class="p-1.5 rounded-lg text-gray-400 hover:text-[#39D3C4] hover:bg-[#39D3C4]/10 transition-colors" title="Edit Patient">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             </a>
-                            <button x-data @click="$dispatch('open-drawer', 'edit-patient-drawer-{{ $patient->id }}')" class="p-1.5 rounded-lg text-gray-400 hover:text-sky-600 hover:bg-sky-50 transition-colors" title="Edit Patient">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            </button>
                             <form action="{{ route('patients.destroy', $patient) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this patient?');">
                                 @csrf
                                 @method('DELETE')
@@ -169,46 +166,6 @@
                         </div>
                     </x-ui.row-card>
 
-                    <!-- Edit Patient Drawer -->
-                    <x-ui.drawer id="edit-patient-drawer-{{ $patient->id }}" title="Edit Patient">
-                        <form id="edit-patient-form-{{ $patient->id }}" action="{{ route('patients.update', $patient) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <div class="space-y-6">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
-                                        <input type="text" name="first_name" value="{{ $patient->first_name }}" required class="w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
-                                        <input type="text" name="last_name" value="{{ $patient->last_name }}" required class="w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
-                                        <input type="text" name="phone" value="{{ $patient->phone }}" required class="w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                        <input type="email" name="email" value="{{ $patient->email }}" class="w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">National ID</label>
-                                    <input type="text" name="national_id" value="{{ $patient->national_id }}" class="w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
-                                </div>
-                            </div>
-                        </form>
-
-                        <x-slot name="footer">
-                            <x-ui.button variant="secondary" x-on:click="show = false">Cancel</x-ui.button>
-                            <x-ui.button variant="primary" x-on:click="document.getElementById('edit-patient-form-{{ $patient->id }}').submit()">Save Changes</x-ui.button>
-                        </x-slot>
-                    </x-ui.drawer>
                 @endforeach
             </x-ui.row-list>
             

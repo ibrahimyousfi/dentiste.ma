@@ -97,6 +97,7 @@ Route::middleware('auth')->group(function () {
     Route::post('patients/{patient}/recall', [PatientController::class, 'recall'])->name('patients.recall');
     Route::post('waitlist/{waitlist}/notify', [\App\Http\Controllers\WaitlistController::class, 'notify'])->name('waitlist.notify');
     Route::get('patients/{patient}/dental-chart', [DentalChartController::class, 'show'])->name('patients.dental-chart');
+    Route::get('patients/{patient}/dental-chart/print', [DentalChartController::class, 'print'])->name('patients.dental-chart.print');
     Route::post('patients/{patient}/dental-chart', [DentalChartController::class, 'store'])->name('patients.dental-chart.store');
     Route::post('patients/{patient}/dental-chart/generate-plan', [DentalChartController::class, 'generatePlan'])->name('patients.dental-chart.generate-plan');
     Route::resource('inventory', InventoryController::class);

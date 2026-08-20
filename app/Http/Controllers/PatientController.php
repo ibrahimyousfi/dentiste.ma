@@ -101,8 +101,16 @@ class PatientController extends Controller
      */
     public function show(Patient $patient)
     {
-        $patient->load(['notes.user', 'invoices.payments']);
-        return view('patients.show', compact('patient'));
+        $patient->load(['notes.user', 'invoices.payments', 'appointments.dentist']);
+
+        $findings = \App\Models\ToothFinding::where('patient_id', $patient->id)->get();
+        $isChild = $patient->date_of_birth
+            ? \Carbon\Carbon::parse($patient->date_of_birth)->age <= 14
+            : false;
+        $treatmentCatalogs = \App\Models\TreatmentCatalog::where('organization_id', auth()->user()->organization_id)->get();
+        $clinicName = auth()->user()->organization->name ?? 'Dental Clinic';
+
+        return view('patients.show', compact('patient', 'findings', 'isChild', 'treatmentCatalogs', 'clinicName'));
     }
 
     /**
@@ -110,7 +118,7 @@ class PatientController extends Controller
      */
     public function edit(Patient $patient)
     {
-        return view('patients.edit', compact('patient'));
+        return redirect()->route('patients.show', $patient);
     }
 
     /**
@@ -132,7 +140,7 @@ class PatientController extends Controller
 
         $patient->update($validated);
 
-        return redirect()->route('patients.index')->with('success', 'Patient updated successfully.');
+        return redirect()->route('patients.show', $patient)->with('success', 'Patient updated successfully.');
     }
 
     /**

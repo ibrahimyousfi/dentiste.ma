@@ -1,39 +1,23 @@
 <x-app-layout>
-    <div class="py-8 animate-fade-in" x-data="{ tab: window.location.hash ? window.location.hash.substring(1) : 'overview' }" x-init="$watch('tab', value => window.history.replaceState(null, null, '#' + value))">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            
-            <!-- Patient Profile Header -->
-            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center space-x-4 w-full md:w-auto">
-                    <a href="{{ route('patients.index') }}" class="p-2.5 bg-gray-50 border border-gray-200 text-gray-500 hover:text-[#39D3C4] hover:border-[#39D3C4]/50 rounded-xl transition-all shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    </a>
-                    <div class="flex items-center">
-                        <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#39D3C4]/20 to-blue-500/20 border border-white flex items-center justify-center text-gray-700 font-bold text-2xl shadow-sm">
-                            {{ substr($patient->first_name, 0, 1) }}{{ substr($patient->last_name, 0, 1) }}
-                        </div>
-                        <div class="ml-4">
-                            <h2 class="font-extrabold text-2xl text-gray-900 tracking-tight">
-                                {{ $patient->first_name }} {{ $patient->last_name }}
-                            </h2>
-                            <div class="flex flex-wrap items-center gap-3 mt-1.5">
-                                <span class="bg-[#39D3C4]/10 text-[#2db3a6] border border-[#39D3C4]/20 text-xs font-bold px-2.5 py-0.5 rounded-full">PT-{{ str_pad($patient->id, 5, '0', STR_PAD_LEFT) }}</span>
-                                <span class="text-sm font-medium text-gray-500 flex items-center">
-                                    <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                                    {{ $patient->phone ?? 'No phone' }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex gap-3 w-full md:w-auto">
-                    <a href="{{ route('patients.dental-chart', $patient) }}" class="flex-1 md:flex-none inline-flex justify-center items-center px-5 py-2.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-700 shadow-sm hover:bg-gray-50 hover:text-[#39D3C4] transition-all">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Dental Chart
-                    </a>
+    <x-slot name="header_title">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('patients.index') }}" class="p-1.5 text-gray-400 hover:text-[#39D3C4] transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </a>
+            <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-[#39D3C4]/20 to-blue-500/20 flex items-center justify-center text-gray-700 font-bold text-sm shrink-0">
+                {{ substr($patient->first_name, 0, 1) }}{{ substr($patient->last_name, 0, 1) }}
+            </div>
+            <div>
+                <p class="font-extrabold text-gray-900 text-sm leading-none">{{ $patient->first_name }} {{ $patient->last_name }}</p>
+                <div class="flex items-center gap-3 mt-0.5">
+                    <span class="text-xs font-bold text-[#39D3C4]">PT-{{ str_pad($patient->id, 5, '0', STR_PAD_LEFT) }}</span>
+                    <span class="text-xs text-gray-400">{{ $patient->phone ?? '' }}</span>
                 </div>
             </div>
+        </div>
+    </x-slot>
+    <div class="py-4 animate-fade-in" x-data="{ tab: window.location.hash ? window.location.hash.substring(1) : 'overview', chartOpen: false }" x-init="$watch('tab', value => window.history.replaceState(null, null, '#' + value))">
+        <div class="w-full px-2">
 
             <!-- Tabs Navigation -->
             <div class="mb-6 bg-white p-2 rounded-2xl shadow-sm border border-gray-100 flex space-x-2 overflow-x-auto">
@@ -64,93 +48,318 @@
                 <!-- Overview Tab -->
                 <div x-show="tab === 'overview'" x-transition.opacity.duration.300ms class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    <!-- Patient Info Card -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-full hover:shadow-md transition-shadow relative overflow-hidden">
+                    <!-- Patient Info Card (Inline Edit Form) -->
+                    <form action="{{ route('patients.update', $patient) }}" method="POST"
+                          class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-full hover:shadow-md transition-shadow relative overflow-hidden">
+                        @csrf
+                        @method('PUT')
                         <div class="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-bl-full -z-10"></div>
                         <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
                             <h3 class="text-lg font-bold text-gray-900">Patient Details</h3>
-                            <a href="{{ route('patients.edit', $patient) }}" class="inline-flex items-center text-xs font-bold text-[#2db3a6] bg-[#39D3C4]/10 hover:bg-[#39D3C4]/20 px-3 py-1.5 rounded-lg transition-colors">
-                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                Edit
-                            </a>
+                            <button type="submit" class="inline-flex items-center text-xs font-bold text-white bg-[#39D3C4] hover:bg-[#2db3a6] px-3 py-1.5 rounded-lg transition-colors">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                Save
+                            </button>
                         </div>
-                        <div class="space-y-5 text-sm flex-1">
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date of Birth</span>
-                                <span class="font-semibold text-gray-900">{{ $patient->date_of_birth ?? 'Not specified' }}</span>
+                        <div class="space-y-4 text-sm flex-1">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">First Name</label>
+                                    <input type="text" name="first_name" value="{{ old('first_name', $patient->first_name) }}" required
+                                           class="w-full rounded-lg border-gray-200 bg-gray-50 text-gray-900 text-sm focus:ring-[#39D3C4] focus:border-[#39D3C4] py-2">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">Last Name</label>
+                                    <input type="text" name="last_name" value="{{ old('last_name', $patient->last_name) }}" required
+                                           class="w-full rounded-lg border-gray-200 bg-gray-50 text-gray-900 text-sm focus:ring-[#39D3C4] focus:border-[#39D3C4] py-2">
+                                </div>
                             </div>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Gender</span>
-                                <span class="font-semibold text-gray-900 capitalize">{{ $patient->gender ?? 'Not specified' }}</span>
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">Phone</label>
+                                <input type="text" name="phone" value="{{ old('phone', $patient->phone) }}" required
+                                       class="w-full rounded-lg border-gray-200 bg-gray-50 text-gray-900 text-sm focus:ring-[#39D3C4] focus:border-[#39D3C4] py-2">
                             </div>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">National ID</span>
-                                <span class="font-semibold text-gray-900">{{ $patient->national_id ?? '-' }}</span>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">Date of Birth</label>
+                                    <input type="date" name="date_of_birth" value="{{ old('date_of_birth', $patient->date_of_birth ? \Carbon\Carbon::parse($patient->date_of_birth)->format('Y-m-d') : '') }}"
+                                           class="w-full rounded-lg border-gray-200 bg-gray-50 text-gray-900 text-sm focus:ring-[#39D3C4] focus:border-[#39D3C4] py-2">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">Gender</label>
+                                    <select name="gender" class="w-full rounded-lg border-gray-200 bg-gray-50 text-gray-900 text-sm focus:ring-[#39D3C4] focus:border-[#39D3C4] py-2">
+                                        <option value="">—</option>
+                                        <option value="male" @selected(old('gender', $patient->gender) == 'male')>Male</option>
+                                        <option value="female" @selected(old('gender', $patient->gender) == 'female')>Female</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Email</span>
-                                <span class="font-semibold text-gray-900">{{ $patient->email ?? '-' }}</span>
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">National ID</label>
+                                <input type="text" name="national_id" value="{{ old('national_id', $patient->national_id) }}"
+                                       class="w-full rounded-lg border-gray-200 bg-gray-50 text-gray-900 text-sm focus:ring-[#39D3C4] focus:border-[#39D3C4] py-2">
                             </div>
-                            <div class="flex flex-col pt-2 border-t border-gray-100">
-                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Address</span>
-                                <span class="font-semibold text-gray-900 leading-relaxed">{{ $patient->address ?? '-' }}</span>
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">Email</label>
+                                <input type="email" name="email" value="{{ old('email', $patient->email) }}"
+                                       class="w-full rounded-lg border-gray-200 bg-gray-50 text-gray-900 text-sm focus:ring-[#39D3C4] focus:border-[#39D3C4] py-2">
+                            </div>
+                            <div class="pt-2 border-t border-gray-100">
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">Address</label>
+                                <textarea name="address" rows="2"
+                                          class="w-full rounded-lg border-gray-200 bg-gray-50 text-gray-900 text-sm focus:ring-[#39D3C4] focus:border-[#39D3C4] resize-none">{{ old('address', $patient->address) }}</textarea>
                             </div>
                         </div>
+                    </form>
+
+                    <!-- Dental Chart (Inline) -->
+                    <div class="lg:col-span-2"
+                         x-data="odontogram()"
+                         @save-odontogram.window="saveChart()"
+                         @print-chart.window="printChart()">
+                        @include('patients.partials.odontogram-screen')
+                        @include('patients.partials.odontogram-print')
                     </div>
 
-                    <!-- Upcoming Appointments & Quick Stats -->
-                    <div class="lg:col-span-2 space-y-6">
-                        <div class="bg-gradient-to-r from-[#21c8b6] to-[#12a19b] rounded-3xl shadow-lg shadow-[#39D3C4]/20 p-8 text-white relative overflow-hidden">
-                            <div class="relative z-10 flex justify-between items-center">
-                                <div>
-                                    <h3 class="text-sm font-bold uppercase tracking-wider text-white/80 mb-2">Upcoming Appointment</h3>
-                                    @php
-                                        $upcoming = clone $patient->appointments;
-                                        $next = $upcoming->sortBy('appointment_date')->first();
-                                    @endphp
-                                    @if($next)
-                                        <p class="text-3xl font-extrabold mb-2">{{ \Carbon\Carbon::parse($next->appointment_date)->format('M d, Y') }} at {{ \Carbon\Carbon::parse($next->start_time)->format('h:i A') }}</p>
-                                        <p class="text-white/90 font-medium flex items-center">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                            Dr. {{ $next->dentist->name ?? 'Unassigned' }}
-                                        </p>
-                                    @else
-                                        <p class="text-3xl font-extrabold mb-4">No appointments scheduled</p>
-                                        <a href="{{ route('appointments.index') }}" class="inline-flex px-5 py-2.5 bg-white text-[#12a19b] hover:bg-gray-50 rounded-xl text-sm font-bold shadow-sm transition-all hover:scale-105 active:scale-95">
-                                            Schedule Visit
-                                        </a>
-                                    @endif
-                                </div>
-                                <div class="hidden sm:block opacity-20">
-                                    <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                </div>
-                            </div>
-                            <!-- Decorative background circle -->
-                            <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-                            <div class="absolute top-0 right-10 w-32 h-32 bg-[#39D3C4]/50 rounded-full blur-3xl"></div>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                                <div class="flex items-center justify-between mb-4">
-                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Visits</span>
-                                    <div class="p-2 bg-blue-50 text-blue-500 rounded-lg">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                                    </div>
-                                </div>
-                                <span class="text-3xl font-extrabold text-gray-900">{{ $patient->appointments->count() }}</span>
-                            </div>
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                                <div class="flex items-center justify-between mb-4">
-                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Outstanding Balance</span>
-                                    <div class="p-2 bg-green-50 text-green-500 rounded-lg">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    </div>
-                                </div>
-                                <span class="text-3xl font-extrabold text-emerald-500">$0.00</span>
-                            </div>
-                        </div>
-                    </div>
+                    @push('scripts')
+                    <script>
+                        document.addEventListener('alpine:init', () => {
+                            Alpine.data('odontogram', () => ({
+                                activeTool: 'eraser',
+                                treatmentCatalogs: @json($treatmentCatalogs),
+                                chartData: {},
+                                isSaving: false,
+                                isChild: @json($isChild),
+                                canEditChart: @json(auth()->user()->hasRole('Clinic Owner')),
+                                findings: @json($findings),
+
+                                init() {
+                                    const allTeeth = [
+                                        18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28,
+                                        48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38,
+                                        55,54,53,52,51, 61,62,63,64,65,
+                                        85,84,83,82,81, 71,72,73,74,75
+                                    ];
+                                    allTeeth.forEach(t => {
+                                        this.chartData[t] = { status: 'healthy', surfaces: { T: 'healthy', R: 'healthy', B: 'healthy', L: 'healthy', C: 'healthy' }, treatments: [], received: 0 };
+                                    });
+                                    if (this.findings && this.findings.length > 0) {
+                                        this.findings.forEach(f => {
+                                            if (this.chartData[f.tooth_number]) {
+                                                this.chartData[f.tooth_number].status = f.status;
+                                                if (f.surfaces) this.chartData[f.tooth_number].surfaces = f.surfaces;
+                                                if (f.treatments && Array.isArray(f.treatments) && f.treatments.length > 0) {
+                                                    this.chartData[f.tooth_number].treatments = f.treatments;
+                                                } else {
+                                                    let price = f.price ? parseFloat(f.price) : 0;
+                                                    if (price > 0) this.chartData[f.tooth_number].treatments.push({ id: null, name: 'Legacy Treatment', price });
+                                                }
+                                                this.chartData[f.tooth_number].received = f.received !== undefined ? parseFloat(f.received) : 0;
+                                            }
+                                        });
+                                    }
+                                    window.addEventListener('save-odontogram', () => this.saveChart());
+                                    window.addEventListener('print-chart', () => this.printChart());
+                                },
+
+                                applyTool(tooth, surface = null) {
+                                    if (!this.canEditChart || !this.activeTool) return;
+                                    if (this.activeTool.startsWith('treatment_')) {
+                                        let catalogId = this.activeTool.split('_')[1];
+                                        let item = this.treatmentCatalogs.find(t => t.id == catalogId);
+                                        if (item) this.chartData[tooth].treatments.push({ id: item.id, name: item.name, price: parseFloat(item.default_price) });
+                                    } else {
+                                        if (this.activeTool === 'eraser') {
+                                            if (surface) { this.chartData[tooth].surfaces[surface] = 'healthy'; }
+                                            else { this.chartData[tooth].status = 'healthy'; this.chartData[tooth].surfaces = { T: 'healthy', R: 'healthy', B: 'healthy', L: 'healthy', C: 'healthy' }; }
+                                        } else if (this.activeTool === 'extracted') { this.chartData[tooth].status = 'extracted'; }
+                                        else if (this.activeTool === 'crown') { this.chartData[tooth].status = 'crown'; }
+                                        else if (['decayed', 'filled'].includes(this.activeTool)) {
+                                            if (surface) { this.chartData[tooth].surfaces[surface] = this.activeTool; if (this.chartData[tooth].status === 'extracted') this.chartData[tooth].status = 'healthy'; }
+                                            else { this.chartData[tooth].status = this.activeTool; }
+                                        }
+                                    }
+                                },
+
+                                isToothAffected(tooth) {
+                                    if (!this.chartData[tooth]) return false;
+                                    let d = this.chartData[tooth];
+                                    if (d.status !== 'healthy') return true;
+                                    if (d.treatments.length > 0) return true;
+                                    return Object.values(d.surfaces).some(s => s !== 'healthy');
+                                },
+
+                                hasFindings() { return Object.keys(this.chartData).some(t => this.isToothAffected(t)); },
+
+                                getTreatmentDescription(tooth) {
+                                    let d = this.chartData[tooth]; if (!d) return '';
+                                    let parts = [];
+                                    if (d.status === 'extracted') parts.push('Extraction (Missing)');
+                                    if (d.status === 'crown') parts.push('Crown / Bridge');
+                                    if (d.status === 'decayed') parts.push('Decayed');
+                                    for (let s in d.surfaces) { if (d.surfaces[s] === 'decayed') parts.push(`Caries (${s})`); if (d.surfaces[s] === 'filled') parts.push(`Filling (${s})`); }
+                                    if (d.treatments) d.treatments.forEach(t => parts.push(t.name));
+                                    return parts.join(', ');
+                                },
+
+                                calculateTotal() { let t = 0; for (const tooth in this.chartData) { if (this.isToothAffected(tooth)) this.chartData[tooth].treatments.forEach(tr => t += parseFloat(tr.price || 0)); } return t; },
+                                calculateReceived() { let t = 0; for (const tooth in this.chartData) { if (this.isToothAffected(tooth)) t += parseFloat(this.chartData[tooth].received || 0); } return t; },
+
+                                formatPrice(price) { return (parseFloat(price) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' DH'; },
+
+                                getGroupedTreatments() {
+                                    const groups = {};
+                                    for (const tooth in this.chartData) {
+                                        if (this.isToothAffected(tooth)) {
+                                            let toothTotalPrice = 0;
+                                            this.chartData[tooth].treatments.forEach(t => toothTotalPrice += parseFloat(t.price || 0));
+                                            const desc = this.getTreatmentDescription(tooth) || 'Consultation / Diagnosis';
+                                            if (!groups[desc]) groups[desc] = { description: desc, teeth: [], totalPrice: 0, totalReceived: 0 };
+                                            groups[desc].teeth.push(tooth);
+                                            groups[desc].totalPrice += toothTotalPrice;
+                                            groups[desc].totalReceived += parseFloat(this.chartData[tooth].received || 0);
+                                        }
+                                    }
+                                    return Object.values(groups);
+                                },
+
+                                getSurfaceColor(tooth, surface) {
+                                    let d = this.chartData[tooth]; if (!d) return '#ffffff';
+                                    if (d.status === 'extracted') return 'none';
+                                    if (d.status === 'crown') return '#fef08a';
+                                    let s = d.surfaces[surface];
+                                    if (s === 'decayed') return '#ef4444';
+                                    if (s === 'filled') return '#3b82f6';
+                                    return '#ffffff';
+                                },
+
+                                getToothStroke(tooth) {
+                                    let d = this.chartData[tooth]; if (!d) return '#d1d5db';
+                                    if (d.status === 'extracted') return 'none';
+                                    if (d.status === 'crown') return '#ca8a04';
+                                    return '#9ca3af';
+                                },
+
+                                renderToothInteractive(tooth) {
+                                    if (!tooth) return '';
+                                    let d = this.chartData[tooth];
+                                    let stroke = this.getToothStroke(tooth);
+                                    let cT = this.getSurfaceColor(tooth, 'T'), cR = this.getSurfaceColor(tooth, 'R'), cB = this.getSurfaceColor(tooth, 'B'), cL = this.getSurfaceColor(tooth, 'L'), cC = this.getSurfaceColor(tooth, 'C');
+                                    let isExtracted = d && d.status === 'extracted';
+                                    let hasTreatments = d && d.treatments.length > 0;
+                                    if (isExtracted) return `<svg viewBox="0 0 40 40" class="w-full h-full"><line x1="5" y1="5" x2="35" y2="35" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/><line x1="35" y1="5" x2="5" y2="35" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/></svg>`;
+                                    return `<svg viewBox="0 0 40 40" class="w-full h-full" @click.stop="applyTool(${tooth})"><polygon points="20,2 38,20 20,38 2,20" fill="${cT}" stroke="${stroke}" stroke-width="1" @click.stop="applyTool(${tooth}, 'T')"/><polygon points="20,10 30,20 20,30 10,20" fill="${cC}" stroke="${stroke}" stroke-width="1" @click.stop="applyTool(${tooth}, 'C')"/><polygon points="38,20 30,20 20,30 20,38" fill="${cR}" stroke="${stroke}" stroke-width="1" @click.stop="applyTool(${tooth}, 'R')"/><polygon points="2,20 10,20 20,30 20,38" fill="${cL}" stroke="${stroke}" stroke-width="1" @click.stop="applyTool(${tooth}, 'L')"/>${hasTreatments ? '<circle cx="35" cy="5" r="5" fill="#8b5cf6"/>' : ''}</svg>`;
+                                },
+
+                                getArchStyle(tooth) {
+                                    let t = parseInt(tooth), isUpper = false, isAdult = true, index = 0;
+                                    if (t >= 11 && t <= 18) { isUpper = true; isAdult = true; index = t - 11; }
+                                    if (t >= 21 && t <= 28) { isUpper = true; isAdult = true; index = t - 21; }
+                                    if (t >= 41 && t <= 48) { isUpper = false; isAdult = true; index = t - 41; }
+                                    if (t >= 31 && t <= 38) { isUpper = false; isAdult = true; index = t - 31; }
+                                    if (t >= 51 && t <= 55) { isUpper = true; isAdult = false; index = t - 51; }
+                                    if (t >= 61 && t <= 65) { isUpper = true; isAdult = false; index = t - 61; }
+                                    if (t >= 81 && t <= 85) { isUpper = false; isAdult = false; index = t - 81; }
+                                    if (t >= 71 && t <= 75) { isUpper = false; isAdult = false; index = t - 71; }
+                                    let multY = isAdult ? 6.0 : 7.0, multX = isAdult ? 2.5 : 3.0;
+                                    let y = Math.pow(index, 1.4) * multY, x = Math.pow(index, 1.2) * multX;
+                                    let isLeftQuad = (t >= 11 && t <= 18) || (t >= 41 && t <= 48) || (t >= 51 && t <= 55) || (t >= 81 && t <= 85);
+                                    if (isLeftQuad) x = -x;
+                                    if (!isUpper) y = -y;
+                                    return `transform: translate3d(${x}px, ${y}px, 0);`;
+                                },
+
+                                isUpperTooth(tooth) { let t = parseInt(tooth); return (t >= 11 && t <= 28) || (t >= 51 && t <= 65); },
+                                isAdultTooth(tooth) { let t = parseInt(tooth); return (t >= 11 && t <= 48); },
+
+                                async saveChart() {
+                                    this.isSaving = true;
+                                    try {
+                                        const res = await fetch('{{ route("patients.dental-chart.store", $patient) }}', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                                            body: JSON.stringify({ chartData: this.chartData })
+                                        });
+                                        const data = await res.json();
+                                        if (data.success) { alert('Chart saved!'); }
+                                    } catch (e) { alert('Error saving chart.'); }
+                                    finally { this.isSaving = false; }
+                                },
+
+                                async generatePlan() {
+                                    try {
+                                        const res = await fetch('{{ route("patients.dental-chart.generate-plan", $patient) }}', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                                            body: JSON.stringify({ chartData: this.chartData })
+                                        });
+                                        const data = await res.json();
+                                        if (data.success && data.redirect_url) window.location = data.redirect_url;
+                                        else alert(data.message || 'No treatments found.');
+                                    } catch (e) { alert('Error generating plan.'); }
+                                },
+
+                                printChart() {
+                                    const printElement = document.getElementById('print-area');
+                                    if (!printElement) return;
+                                    let styles = '';
+                                    document.querySelectorAll('style, link[rel="stylesheet"]').forEach(n => styles += n.outerHTML);
+                                    let oldIframe = document.getElementById('hidden-print-iframe');
+                                    if (oldIframe) oldIframe.remove();
+                                    const iframe = document.createElement('iframe');
+                                    iframe.id = 'hidden-print-iframe';
+                                    Object.assign(iframe.style, { position: 'absolute', width: '100vw', height: '100vh', left: '-9999px', top: '-9999px', border: 'none' });
+                                    document.body.appendChild(iframe);
+                                    const doc = iframe.contentWindow.document;
+                                    doc.head.innerHTML = `<title>Dental Chart - {{ $patient->first_name }} {{ $patient->last_name }}</title>${styles}`;
+                                    doc.body.innerHTML = '<div class="a5-container">' + printElement.innerHTML + '</div>';
+                                    setTimeout(() => { iframe.contentWindow.focus(); iframe.contentWindow.print(); }, 1200);
+                                },
+
+                                getPrintArchStyle(tooth) {
+                                    let t = parseInt(tooth), isUpper = false, isAdult = true, index = 0, isLeftQuad = false;
+                                    if (t >= 11 && t <= 18) { isUpper = true; isAdult = true; index = t - 11; isLeftQuad = true; }
+                                    if (t >= 21 && t <= 28) { isUpper = true; isAdult = true; index = t - 21; }
+                                    if (t >= 41 && t <= 48) { isUpper = false; isAdult = true; index = t - 41; isLeftQuad = true; }
+                                    if (t >= 31 && t <= 38) { isUpper = false; isAdult = true; index = t - 31; }
+                                    if (t >= 51 && t <= 55) { isUpper = true; isAdult = false; index = t - 51; isLeftQuad = true; }
+                                    if (t >= 61 && t <= 65) { isUpper = true; isAdult = false; index = t - 61; }
+                                    if (t >= 81 && t <= 85) { isUpper = false; isAdult = false; index = t - 81; isLeftQuad = true; }
+                                    if (t >= 71 && t <= 75) { isUpper = false; isAdult = false; index = t - 71; }
+                                    let totalTeeth = isAdult ? 8.2 : 5.2;
+                                    let angleRad = ((index + 0.5) / totalTeeth) * (Math.PI / 2);
+                                    if (isLeftQuad) angleRad = -angleRad;
+                                    let rx = isAdult ? 180 : 100, ry = isAdult ? 220 : 120;
+                                    let x = Math.sin(angleRad) * rx, y = Math.cos(angleRad) * ry;
+                                    if (isUpper) y = -y;
+                                    let originY = isUpper ? -30 : 30; y += originY;
+                                    return `position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) translate(${x}px, ${y}px);`;
+                                },
+
+                                getPrintNumberStyle(tooth) {
+                                    let t = parseInt(tooth), isUpper = false, isAdult = true, index = 0, isLeftQuad = false;
+                                    if (t >= 11 && t <= 18) { isUpper = true; isAdult = true; index = t - 11; isLeftQuad = true; }
+                                    if (t >= 21 && t <= 28) { isUpper = true; isAdult = true; index = t - 21; }
+                                    if (t >= 41 && t <= 48) { isUpper = false; isAdult = true; index = t - 41; isLeftQuad = true; }
+                                    if (t >= 31 && t <= 38) { isUpper = false; isAdult = true; index = t - 31; }
+                                    if (t >= 51 && t <= 55) { isUpper = true; isAdult = false; index = t - 51; isLeftQuad = true; }
+                                    if (t >= 61 && t <= 65) { isUpper = true; isAdult = false; index = t - 61; }
+                                    if (t >= 81 && t <= 85) { isUpper = false; isAdult = false; index = t - 81; isLeftQuad = true; }
+                                    if (t >= 71 && t <= 75) { isUpper = false; isAdult = false; index = t - 71; }
+                                    let totalTeeth = isAdult ? 8.2 : 5.2;
+                                    let angleRad = ((index + 0.5) / totalTeeth) * (Math.PI / 2);
+                                    if (isLeftQuad) angleRad = -angleRad;
+                                    let offset = isAdult ? 40 : 25;
+                                    let rx = (isAdult ? 180 : 100) + offset, ry = (isAdult ? 220 : 120) + offset;
+                                    let x = Math.sin(angleRad) * rx, y = Math.cos(angleRad) * ry;
+                                    if (isUpper) y = -y;
+                                    let originY = isUpper ? -30 : 30; y += originY;
+                                    return `position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) translate(${x}px, ${y}px);`;
+                                },
+                            }));
+                        });
+                    </script>
+                    @endpush
                 </div>
 
                 <!-- Medical History Tab -->

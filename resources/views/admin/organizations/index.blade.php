@@ -124,13 +124,7 @@
 
                                         <div class="h-6 w-px bg-[#334155] mx-1"></div>
 
-                                        <!-- Reset Sub -->
-                                        <form method="POST" action="{{ route('admin.organizations.reset', $org) }}" class="inline">
-                                            @csrf
-                                            <button type="submit" class="p-2 bg-[#0f172a] hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 rounded-lg transition border border-[#334155]" title="Reset Subscription to 14 days" onclick="return confirm('Are you sure you want to reset the subscription to 14 days trial?');">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                            </button>
-                                        </form>
+
 
                                         <!-- Suspend -->
                                         <form method="POST" action="{{ route('admin.organizations.suspend', $org) }}" class="inline">

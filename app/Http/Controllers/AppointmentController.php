@@ -16,7 +16,7 @@ class AppointmentController extends Controller
     public function index(Request $request)
     {
         // If the request wants JSON or has 'start' parameter from FullCalendar, return events
-        if ($request->wantsJson() || $request->has('start')) {
+        if ($request->wantsJson() || ($request->has('start') && !$request->has('view_mode'))) {
             $start = $request->query('start');
             $end = $request->query('end');
 
@@ -62,18 +62,62 @@ class AppointmentController extends Controller
             return response()->json($events);
         }
 
-        // Otherwise, return the View with needed data for modals
+        // --- List View Data Fetching ---
+        $listQuery = Appointment::with(['patient', 'dentist'])->orderBy('appointment_date', 'desc')->orderBy('start_time', 'asc');
+
+        // Filter by Status
+        if ($request->filled('status')) {
+            $listQuery->where('status', $request->status);
+        }
+
+        // Filter by Preset Date Ranges
+        if ($request->filled('date_filter')) {
+            $today = Carbon::today()->format('Y-m-d');
+            
+            switch ($request->date_filter) {
+                case 'today':
+                    $listQuery->where('appointment_date', $today);
+                    break;
+                case 'tomorrow':
+                    $tomorrow = Carbon::tomorrow()->format('Y-m-d');
+                    $listQuery->where('appointment_date', $tomorrow);
+                    break;
+                case '3days':
+                    $threeDaysLater = Carbon::today()->addDays(3)->format('Y-m-d');
+                    $listQuery->whereBetween('appointment_date', [$today, $threeDaysLater]);
+                    break;
+                case '1week':
+                    $oneWeekLater = Carbon::today()->addWeek()->format('Y-m-d');
+                    $listQuery->whereBetween('appointment_date', [$today, $oneWeekLater]);
+                    break;
+            }
+        }
+
+        // Filter by Dentist
+        if ($request->filled('dentist_id')) {
+            $listQuery->where('dentist_id', $request->dentist_id);
+        }
+
+        // Filter by Patient Name (from global header search)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $listQuery->whereHas('patient', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        $appointmentsList = $listQuery->paginate(15)->withQueryString();
+
+        // Data for modals and filters
         $patients = Patient::orderBy('first_name')->get();
-        
-        // Dentists are users with 'Clinic Owner' role (or we can just fetch all users for now if it's a small clinic)
-        // Ideally we fetch users who have permission to be dentists.
-        // For SaaS, usually we'll just get all users in the organization who aren't patients or secretaries.
         $dentists = User::where('organization_id', auth()->user()->organization_id ?? 1)
             ->whereHas('roles', function($q) {
-                $q->where('name', 'Clinic Owner'); // Or 'Dentist' if added later
+                $q->where('name', 'Clinic Owner'); // Or 'Dentist'
             })->get();
 
-        return view('appointments.index', compact('patients', 'dentists'));
+        return view('appointments.index', compact('patients', 'dentists', 'appointmentsList'));
     }
 
     /**

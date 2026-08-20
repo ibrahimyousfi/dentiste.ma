@@ -22,9 +22,15 @@
                         <h4 class="text-md font-bold text-gray-800">Manage Appointments</h4>
                         <p class="text-sm text-gray-500 mt-1">Book new patients or adjust schedule.</p>
                     </div>
-                    <a href="{{ route('appointments.index') }}" class="bg-[#39D3C4] text-white font-bold px-5 py-2.5 rounded-xl shadow-lg hover:-translate-y-0.5 hover:bg-[#2db3a6] transition transform">
-                        Calendar
-                    </a>
+                    <div class="flex gap-3">
+                        <button type="button" @click="$dispatch('open-appointment-modal')" class="bg-gray-100 text-gray-800 font-bold px-4 py-2.5 rounded-xl hover:bg-gray-200 transition">
+                            <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            New
+                        </button>
+                        <a href="{{ route('appointments.index') }}" class="bg-[#39D3C4] text-white font-bold px-5 py-2.5 rounded-xl shadow-lg hover:-translate-y-0.5 hover:bg-[#2db3a6] transition transform">
+                            Calendar
+                        </a>
+                    </div>
                 </div>
                 
                 <!-- Daily Revenue Widget -->
@@ -101,7 +107,7 @@
                                         <p class="font-bold text-sm text-gray-900">{{ $item->patient->first_name }} {{ $item->patient->last_name }}</p>
                                         <p class="text-xs text-gray-500 mt-0.5">{{ $item->patient->phone }} • {{ $item->preferred_days ?? 'Any day' }}</p>
                                     </div>
-                                    <button class="text-[#39D3C4] hover:text-[#2db3a6] text-sm font-bold bg-[#39D3C4]/10 hover:bg-[#39D3C4]/20 px-3 py-1.5 rounded-lg transition-colors">Notify</button>
+                                    <button @click="notifyWaitlist({{ $item->id }})" class="text-[#39D3C4] hover:text-[#2db3a6] text-sm font-bold bg-[#39D3C4]/10 hover:bg-[#39D3C4]/20 px-3 py-1.5 rounded-lg transition-colors focus:outline-none">Notify</button>
                                 </div>
                                 @endforeach
                             </div>
@@ -132,7 +138,7 @@
                                         <p class="font-bold text-sm text-gray-900">{{ $patient->first_name }} {{ $patient->last_name }}</p>
                                         <p class="text-xs text-gray-500 mt-0.5">Last visited: {{ $patient->updated_at->diffForHumans() }}</p>
                                     </div>
-                                    <button class="text-purple-600 hover:text-purple-800 text-sm font-bold bg-purple-100 hover:bg-purple-200 px-3 py-1.5 rounded-lg transition-colors">Recall</button>
+                                    <button @click="recallPatient({{ $patient->id }})" class="text-purple-600 hover:text-purple-800 text-sm font-bold bg-purple-100 hover:bg-purple-200 px-3 py-1.5 rounded-lg transition-colors focus:outline-none">Recall</button>
                                 </div>
                                 @endforeach
                             </div>
@@ -147,4 +153,64 @@
 
         </div>
     </div>
+
+    @include('appointments.partials.appointment-modal')
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            // Waitlist Notify Logic
+            window.notifyWaitlist = function(id) {
+                if(!confirm('Send a WhatsApp notification to this patient?')) return;
+                
+                fetch(`/waitlist/${id}/notify`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'Error sending notification.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Network error.');
+                });
+            };
+
+            // Recall Patient Logic
+            window.recallPatient = function(id) {
+                if(!confirm('Send a 6-month recall WhatsApp message to this patient?')) return;
+                
+                fetch(`/patients/${id}/recall`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        alert(data.message);
+                        // Optional: update UI or reload
+                    } else {
+                        alert(data.message || 'Error sending recall message.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Network error.');
+                });
+            };
+        });
+    </script>
 </x-app-layout>

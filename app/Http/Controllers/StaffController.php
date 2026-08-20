@@ -13,16 +13,25 @@ class StaffController extends Controller
     /**
      * Display a listing of the staff members in the current clinic.
      */
-    public function index()
+    public function index(Request $request)
     {
         $organizationId = Auth::user()->organization_id;
         
-        // Fetch all users belonging to this clinic, except Super Admins
-        $staffMembers = User::where('organization_id', $organizationId)
+        $query = User::where('organization_id', $organizationId)
             ->whereDoesntHave('roles', function($q) {
                 $q->where('name', 'Super Admin');
-            })
-            ->get();
+            });
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        $staffMembers = $query->get();
 
         return view('clinic-owner.staff.index', compact('staffMembers'));
     }
@@ -40,6 +49,11 @@ class StaffController extends Controller
      */
     public function store(Request $request)
     {
+        $org = auth()->user()->organization;
+        if ($org && !$org->canAddMoreUsers()) {
+            return redirect()->route('staff.index')->with('error', 'You have reached the maximum number of staff members allowed for your subscription plan.');
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],

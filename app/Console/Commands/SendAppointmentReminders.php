@@ -55,16 +55,33 @@ class SendAppointmentReminders extends Command
             $message .= "Please reply to this message to confirm your attendance.\n\n";
             $message .= "We look forward to seeing you!";
 
-            // Send via Service
-            $whatsappService->sendMessage($patient->phone, $message);
-            
-            $this->line("Sent reminder to: {$patient->first_name} {$patient->last_name} (Phone: {$patient->phone})");
+            // Send WhatsApp via Service
+            if ($appointment->organization->hasFeature('whatsapp_reminders')) {
+                try {
+                    $whatsappService->sendMessage($patient->phone, $message);
+                    $this->line("Sent WhatsApp reminder to: {$patient->first_name} {$patient->last_name}");
+                } catch (\Exception $e) {
+                    $this->error("Failed to send WhatsApp to {$patient->phone}: {$e->getMessage()}");
+                }
+            } else {
+                $this->line("Skipped WhatsApp reminder to: {$patient->first_name} {$patient->last_name} (Feature not enabled)");
+            }
+
+            // Send Email Notification
+            if ($patient->email) {
+                try {
+                    $patient->notify(new \App\Notifications\AppointmentReminder($appointment));
+                    $this->line("Sent Email reminder to: {$patient->email}");
+                } catch (\Exception $e) {
+                    $this->error("Failed to send Email to {$patient->email}: {$e->getMessage()}");
+                }
+            }
             
             // Update the flag
             $appointment->reminder_sent_at = now();
             $appointment->save();
         }
 
-        $this->info('All reminders sent successfully!');
+        $this->info('All reminders processed successfully!');
     }
 }

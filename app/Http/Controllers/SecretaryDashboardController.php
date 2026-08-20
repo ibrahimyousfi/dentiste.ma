@@ -62,10 +62,14 @@ class SecretaryDashboardController extends Controller
             ->whereDate('payment_date', $today)
             ->count();
 
+        $patients = \App\Models\Patient::where('organization_id', $organization->id)->orderBy('first_name')->get();
+        $dentists = \App\Models\User::where('organization_id', $organization->id)->role('Dentist')->get();
+
         return view('secretary.dashboard', compact(
             'user', 'organization', 'waitlist', 'recalls', 
             'todayAppointments', 'tomorrowAppointments', 'upcomingAppointments',
-            'todaysRevenue', 'todaysPaymentsCount'
+            'todaysRevenue', 'todaysPaymentsCount',
+            'patients', 'dentists'
         ));
     }
 }

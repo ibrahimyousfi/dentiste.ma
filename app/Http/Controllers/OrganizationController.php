@@ -63,6 +63,18 @@ class OrganizationController extends Controller
 
             // 3. Assign Clinic Owner Role
             $owner->assignRole('Clinic Owner');
+
+            // 4. Create default Subscription (Starter - 14 Days Trial)
+            $starterPlan = \App\Models\SubscriptionPlan::where('slug', 'starter')->first();
+            if ($starterPlan) {
+                \App\Models\Subscription::create([
+                    'organization_id' => $organization->id,
+                    'subscription_plan_id' => $starterPlan->id,
+                    'status' => 'active',
+                    'starts_at' => now(),
+                    'ends_at' => now()->addDays(14),
+                ]);
+            }
         });
 
         return redirect()->route('admin.organizations.index')->with('success', 'Clinic created successfully!');
@@ -77,7 +89,9 @@ class OrganizationController extends Controller
     public function edit($id)
     {
         $organization = Organization::findOrFail($id);
-        return view('admin.organizations.edit', compact('organization'));
+        $plans = \App\Models\SubscriptionPlan::all();
+        $currentPlanId = $organization->subscription ? $organization->subscription->subscription_plan_id : null;
+        return view('admin.organizations.edit', compact('organization', 'plans', 'currentPlanId'));
     }
 
     public function update(Request $request, $id)
@@ -89,10 +103,24 @@ class OrganizationController extends Controller
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string', 'max:1000'],
-            'subscription_plan' => ['required', 'string'],
+            'subscription_plan_id' => ['required', 'exists:subscription_plans,id'],
         ]);
 
-        $organization->update($request->only('name', 'email', 'phone', 'address', 'subscription_plan'));
+        $organization->update($request->only('name', 'email', 'phone', 'address'));
+
+        // Update or Create Subscription
+        if ($organization->subscription) {
+            $organization->subscription->update([
+                'subscription_plan_id' => $request->subscription_plan_id,
+            ]);
+        } else {
+            \App\Models\Subscription::create([
+                'organization_id' => $organization->id,
+                'subscription_plan_id' => $request->subscription_plan_id,
+                'status' => 'active',
+                'starts_at' => now(),
+            ]);
+        }
 
         return redirect()->route('admin.organizations.index')->with('success', 'Clinic updated successfully!');
     }
@@ -107,13 +135,4 @@ class OrganizationController extends Controller
         return redirect()->route('admin.organizations.index')->with('success', $message);
     }
 
-    public function resetSubscription($id)
-    {
-        $organization = Organization::findOrFail($id);
-        $organization->subscription_ends_at = now()->addDays(14);
-        $organization->status = 'active';
-        $organization->save();
-        
-        return redirect()->route('admin.organizations.index')->with('success', 'Subscription reset to 14 days.');
-    }
 }

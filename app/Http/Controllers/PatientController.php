@@ -71,6 +71,11 @@ class PatientController extends Controller
      */
     public function store(Request $request)
     {
+        $org = auth()->user()->organization;
+        if ($org && !$org->canAddMorePatients()) {
+            return redirect()->route('patients.index')->with('error', 'You have reached the maximum number of patients allowed for your subscription plan.');
+        }
+
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -181,5 +186,41 @@ class PatientController extends Controller
         $patient->save();
 
         return back()->with('success', 'Treatment plan started successfully.');
+    }
+
+    /**
+     * Send a recall notification to a patient.
+     */
+    public function recall(Request $request, Patient $patient, \App\Services\WhatsApp\WhatsAppServiceInterface $whatsappService)
+    {
+        // Ensure the patient belongs to the same organization
+        if ($patient->organization_id !== auth()->user()->organization_id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $orgName = auth()->user()->organization->name ?? 'Our Dental Clinic';
+
+        // Message to send
+        $message = "Hello {$patient->first_name},\n\n";
+        $message .= "This is a friendly reminder from {$orgName}. It has been 6 months since your last visit.\n\n";
+        $message .= "Regular checkups are important for your dental health. Please contact us to schedule your next appointment.\n\n";
+        $message .= "Thank you!";
+
+        try {
+            // Check if feature is enabled
+            if (!$organization->hasFeature('whatsapp_reminders')) {
+                return back()->with('error', 'Your current subscription plan does not support WhatsApp Reminders. Please upgrade your plan.');
+            }
+
+            // Send WhatsApp message
+            $whatsappService->sendMessage($patient->phone, $message);
+            
+            // Note: We might want to save a record of this recall in PatientNote or a new table,
+            // but for now, returning success is sufficient to update the UI.
+            
+            return response()->json(['success' => true, 'message' => 'Recall message sent successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to send recall message: ' . $e->getMessage()]);
+        }
     }
 }

@@ -1,6 +1,8 @@
 <x-app-layout>
     <x-slot name="header_search">
-        <x-ui.search placeholder="Search staff..." />
+        <form action="{{ route('staff.index') }}" method="GET" class="w-full">
+            <x-ui.search name="search" value="{{ request('search') }}" placeholder="Search staff by name or email..." />
+        </form>
     </x-slot>
 
     <x-slot name="header_actions">
@@ -50,7 +52,16 @@
                                 </div>
                                 <div class="flex flex-wrap gap-1 mt-1">
                                     @foreach($staff->roles as $role)
-                                        <x-ui.badge variant="teal" size="xs">{{ $role->name }}</x-ui.badge>
+                                        @php
+                                            $variant = match($role->name) {
+                                                'Clinic Owner' => 'emerald',
+                                                'Dentist' => 'blue',
+                                                'Secretary' => 'amber',
+                                                'Assistant' => 'purple',
+                                                default => 'teal',
+                                            };
+                                        @endphp
+                                        <x-ui.badge variant="{{ $variant }}" size="xs">{{ $role->name }}</x-ui.badge>
                                     @endforeach
                                 </div>
                             </div>
@@ -76,9 +87,9 @@
 
                         <!-- Right: Actions -->
                         <div class="flex items-center gap-2 shrink-0">
-                            <a href="{{ route('staff.edit', $staff->id) }}" class="p-1.5 rounded-lg text-gray-400 hover:text-sky-600 hover:bg-sky-50 transition-colors" title="Edit Profile">
+                            <button @click="$dispatch('open-edit-staff', { id: {{ $staff->id }}, name: '{{ addslashes($staff->name) }}', email: '{{ addslashes($staff->email) }}', role: '{{ $staff->roles->first()?->name ?? '' }}' })" class="p-1.5 rounded-lg text-gray-400 hover:text-sky-600 hover:bg-sky-50 transition-colors" title="Edit Profile">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            </a>
+                            </button>
 
                             <x-dropdown align="right" width="48">
                                 <x-slot name="trigger">
@@ -87,7 +98,7 @@
                                     </button>
                                 </x-slot>
                                 <x-slot name="content">
-                                    <x-dropdown-link href="{{ route('staff.edit', $staff->id) }}">Edit Profile</x-dropdown-link>
+                                    <x-dropdown-link href="#" @click.prevent="$dispatch('open-edit-staff', { id: {{ $staff->id }}, name: '{{ addslashes($staff->name) }}', email: '{{ addslashes($staff->email) }}', role: '{{ $staff->roles->first()?->name ?? '' }}' })">Edit Profile</x-dropdown-link>
                                     <x-dropdown-link href="#">Manage Permissions</x-dropdown-link>
                                     <x-dropdown-link href="#">View Schedule</x-dropdown-link>
                                     <div class="border-t border-gray-100 my-1"></div>
@@ -171,4 +182,73 @@
             <x-ui.button variant="primary" x-on:click="document.getElementById('create-staff-form').submit()">Save Staff</x-ui.button>
         </x-slot>
     </x-ui.drawer>
+
+    <!-- Edit Staff Drawer -->
+    <div x-data="{
+        editForm: { id: '', name: '', email: '', role: '' },
+        actionUrl: '',
+        init() {
+            window.addEventListener('open-edit-staff', (e) => {
+                this.editForm = e.detail;
+                // Dynamically build the update route
+                this.actionUrl = '{{ url('clinic/staff') }}/' + this.editForm.id;
+                this.$dispatch('open-drawer', 'edit-staff-drawer');
+            });
+        }
+    }">
+        <x-ui.drawer id="edit-staff-drawer" title="Edit Staff Member">
+            <form id="edit-staff-form" method="POST" :action="actionUrl">
+                @csrf
+                @method('PUT')
+                
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 gap-4">
+                        <!-- Name -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" x-model="editForm.name" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                        </div>
+
+                        <!-- Email Address -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Address <span class="text-red-500">*</span></label>
+                            <input type="email" name="email" x-model="editForm.email" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                        </div>
+                        
+                        <!-- Role -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">System Role <span class="text-red-500">*</span></label>
+                            <select name="role" x-model="editForm.role" required class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                                <option value="Clinic Owner">Doctor / Clinic Owner</option>
+                                <option value="Secretary">Secretary / Receptionist</option>
+                                <option value="Dentist">Dentist</option>
+                                <option value="Assistant">Assistant</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 mb-2 border-t border-gray-200 pt-4">
+                        <p class="text-sm font-medium text-gray-900 mb-1">Change Password (Optional)</p>
+                        <p class="text-xs text-gray-500">Leave blank if you do not want to change the password.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                            <input type="password" name="password" class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                            <input type="password" name="password_confirmation" class="block w-full rounded-xl border-gray-200 focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm">
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <x-slot name="footer">
+                <x-ui.button variant="secondary" x-on:click="show = false">Cancel</x-ui.button>
+                <x-ui.button variant="primary" x-on:click="document.getElementById('edit-staff-form').submit()">Update Staff</x-ui.button>
+            </x-slot>
+        </x-ui.drawer>
+    </div>
 </x-app-layout>

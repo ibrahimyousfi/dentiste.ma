@@ -9,45 +9,66 @@ class SubscriptionController extends Controller
     public function index()
     {
         $organization = auth()->user()->organization;
+        $currentSubscription = $organization->subscription;
         
-        $plans = [
-            'Basic' => [
-                'price' => 29,
-                'features' => ['Up to 500 Patients', 'Basic Appointments', 'Standard Support', '1 Doctor Account'],
-                'color' => 'gray'
-            ],
-            'Pro' => [
-                'price' => 79,
-                'features' => ['Unlimited Patients', 'Advanced Analytics', 'Priority Support', 'Up to 3 Doctors', 'Voice Dictation AI'],
-                'color' => '[#39D3C4]'
-            ],
-            'Premium' => [
-                'price' => 149,
-                'features' => ['Everything in Pro', 'Unlimited Doctors', 'Smart Inventory Management', 'Dedicated Account Manager', 'Custom Integrations'],
-                'color' => 'indigo'
-            ]
-        ];
+        $plans = \App\Models\SubscriptionPlan::where('is_active', true)->get();
         
-        return view('clinic.subscription.index', compact('organization', 'plans'));
+        // Calculate days
+        $daysElapsed = 0;
+        $daysRemaining = 0;
+        $totalDays = 0;
+        $percentage = 0;
+
+        if ($currentSubscription && $currentSubscription->starts_at && $currentSubscription->ends_at) {
+            $start = \Carbon\Carbon::parse($currentSubscription->starts_at);
+            $end = \Carbon\Carbon::parse($currentSubscription->ends_at);
+            $now = now();
+            
+            $totalDays = $start->diffInDays($end) ?: 1;
+            
+            if ($now->greaterThanOrEqualTo($end)) {
+                $daysElapsed = $totalDays;
+                $daysRemaining = 0;
+                $percentage = 100;
+            } else {
+                $daysElapsed = $start->diffInDays($now);
+                $daysRemaining = $now->diffInDays($end);
+                $percentage = min(100, max(0, ($daysElapsed / $totalDays) * 100));
+            }
+        }
+
+        $pendingRequest = \App\Models\SubscriptionRequest::where('organization_id', $organization->id)
+            ->where('status', 'pending')
+            ->first();
+        
+        return view('clinic.subscription.index', compact('organization', 'currentSubscription', 'plans', 'daysElapsed', 'daysRemaining', 'totalDays', 'percentage', 'pendingRequest'));
     }
 
     public function checkout(Request $request)
     {
         $validated = $request->validate([
-            'plan' => 'required|string|in:Basic,Pro,Premium'
+            'plan_id' => 'required|exists:subscription_plans,id',
+            'payment_method' => 'nullable|string'
         ]);
         
         $organization = auth()->user()->organization;
         
-        // Simulate processing payment
-        sleep(1);
+        // Check if there is already a pending request
+        $existing = \App\Models\SubscriptionRequest::where('organization_id', $organization->id)
+            ->where('status', 'pending')
+            ->first();
+            
+        if ($existing) {
+            return redirect()->back()->with('error', 'You already have a pending upgrade request. Please wait for admin approval.');
+        }
         
-        // Update subscription
-        $organization->update([
-            'subscription_plan' => $validated['plan'],
-            'subscription_ends_at' => now()->addMonth(), // Assuming monthly billing
+        \App\Models\SubscriptionRequest::create([
+            'organization_id' => $organization->id,
+            'subscription_plan_id' => $validated['plan_id'],
+            'status' => 'pending',
+            'payment_method' => $request->payment_method ?? 'bank_transfer',
         ]);
         
-        return redirect()->back()->with('success', "Successfully upgraded to the {$validated['plan']} Plan! Thank you for subscribing.");
+        return redirect()->back()->with('success', "Your upgrade request has been sent to the administration. We will activate your new plan once the payment is verified.");
     }
 }

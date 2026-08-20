@@ -56,14 +56,16 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-slate-300 mb-2">Subscription Tier *</label>
-                                <select name="subscription_plan" class="w-full bg-[#0f172a] border border-[#334155] rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition">
-                                    <option value="trial" {{ old('subscription_plan', $organization->subscription_plan) == 'trial' ? 'selected' : '' }}>Trial (Free)</option>
-                                    <option value="basic" {{ old('subscription_plan', $organization->subscription_plan) == 'basic' ? 'selected' : '' }}>Basic Plan ($99/mo)</option>
-                                    <option value="pro" {{ old('subscription_plan', $organization->subscription_plan) == 'pro' ? 'selected' : '' }}>Pro Plan ($299/mo)</option>
-                                    <option value="enterprise" {{ old('subscription_plan', $organization->subscription_plan) == 'enterprise' ? 'selected' : '' }}>Enterprise ($899/mo)</option>
+                                <select name="subscription_plan_id" class="w-full bg-[#0f172a] border border-[#334155] rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition">
+                                    <option value="">Select a plan</option>
+                                    @foreach($plans as $plan)
+                                        <option value="{{ $plan->id }}" {{ (old('subscription_plan_id', $currentPlanId) == $plan->id) ? 'selected' : '' }}>
+                                            {{ $plan->name }} (${{ $plan->price_monthly }}/mo)
+                                        </option>
+                                    @endforeach
                                 </select>
-                                @error('subscription_plan')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
-                                <p class="text-xs text-slate-400 mt-2">Changing the plan here overrides their automated billing settings.</p>
+                                @error('subscription_plan_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
+                                <p class="text-xs text-slate-400 mt-2">Changing the plan here will immediately update the clinic's limits and features.</p>
                             </div>
                         </div>
                     </div>

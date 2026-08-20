@@ -42,9 +42,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/organizations/{organization}/edit', [App\Http\Controllers\OrganizationController::class, 'edit'])->name('organizations.edit');
         Route::put('/organizations/{organization}', [App\Http\Controllers\OrganizationController::class, 'update'])->name('organizations.update');
         Route::post('/organizations/{organization}/suspend', [App\Http\Controllers\OrganizationController::class, 'suspend'])->name('organizations.suspend');
-        Route::post('/organizations/{organization}/reset', [App\Http\Controllers\OrganizationController::class, 'resetSubscription'])->name('organizations.reset');
 
-        Route::get('/subscriptions', function() { return view('admin.subscriptions'); })->name('subscriptions');
+        Route::get('/subscriptions', [\App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('subscriptions');
+        Route::post('/subscriptions/{subscription}/update-plan', [\App\Http\Controllers\Admin\SubscriptionController::class, 'updatePlan'])->name('subscriptions.update-plan');
+        Route::post('/subscriptions/{subscription}/extend', [\App\Http\Controllers\Admin\SubscriptionController::class, 'extend'])->name('subscriptions.extend');
+        Route::post('/subscriptions/{subscription}/suspend', [\App\Http\Controllers\Admin\SubscriptionController::class, 'suspend'])->name('subscriptions.suspend');
+        Route::post('/subscriptions/requests/{request}/approve', [\App\Http\Controllers\Admin\SubscriptionController::class, 'approveRequest'])->name('subscriptions.requests.approve');
+        Route::post('/subscriptions/requests/{request}/reject', [\App\Http\Controllers\Admin\SubscriptionController::class, 'rejectRequest'])->name('subscriptions.requests.reject');
         Route::get('/revenue', function() { return view('admin.revenue'); })->name('revenue');
         Route::get('/settings', function() { return view('admin.settings'); })->name('settings');
     });
@@ -82,6 +86,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('patients', PatientController::class);
     Route::post('patients/{patient}/increment-session', [PatientController::class, 'incrementSession'])->name('patients.increment-session');
     Route::post('patients/{patient}/set-sessions', [PatientController::class, 'setSessions'])->name('patients.set-sessions');
+    Route::post('patients/{patient}/recall', [PatientController::class, 'recall'])->name('patients.recall');
+    Route::post('waitlist/{waitlist}/notify', [\App\Http\Controllers\WaitlistController::class, 'notify'])->name('waitlist.notify');
     Route::get('patients/{patient}/dental-chart', [DentalChartController::class, 'show'])->name('patients.dental-chart');
     Route::post('patients/{patient}/dental-chart', [DentalChartController::class, 'store'])->name('patients.dental-chart.store');
     Route::post('patients/{patient}/dental-chart/generate-plan', [DentalChartController::class, 'generatePlan'])->name('patients.dental-chart.generate-plan');
@@ -104,15 +110,8 @@ Route::middleware('auth')->group(function () {
     // Financial Routes
     Route::resource('payments', App\Http\Controllers\PaymentController::class)->only(['store', 'index']);
     
-    Route::get('/invoices', function() {
-        $org_id = auth()->user()->organization_id ?? 1;
-        $patients = \App\Models\Patient::where('organization_id', $org_id)->orderBy('first_name')->get();
-        return view('invoices.index', compact('patients'));
-    })->name('invoices.index');
-    
-    Route::get('/invoices/show', function() {
-        return view('invoices.show');
-    })->name('invoices.show');
+    Route::post('/invoices/{invoice}/pay', [App\Http\Controllers\InvoiceController::class, 'pay'])->name('invoices.pay');
+    Route::resource('invoices', App\Http\Controllers\InvoiceController::class);
 });
 
 // ==========================================

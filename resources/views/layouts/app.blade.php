@@ -40,14 +40,8 @@
                 
                 <!-- Topbar -->
                 <header class="bg-white border-b border-gray-200 sticky top-0 z-30 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-                    <!-- Left Side (Toggle + Title) -->
+                    <!-- Left Side (Title) -->
                     <div class="flex items-center">
-                        <!-- Toggle Button (shown only when sidebar is collapsed/closed) -->
-                        <button x-show="!sidebarOpen" @click="sidebarOpen = true" class="text-gray-500 hover:text-[#39D3C4] focus:outline-none focus:ring-2 focus:ring-[#39D3C4] rounded-lg p-2 transition-colors mr-3" title="Ouvrir le menu">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
-                        </button>
                         @isset($header_title)
                             <div class="hidden md:flex items-center">
                                 {{ $header_title }}
@@ -82,8 +76,8 @@
                 </header>
 
                 <!-- Scrollable Content Area -->
-                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-[#F9FAFB] p-6">
-                    <div class="w-full max-w-7xl mx-auto">
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-[#F9FAFB] p-4">
+                    <div class="w-full max-w-full mx-auto">
                         <!-- Mobile Actions (shown only on small screens) -->
                         @isset($header_actions)
                             <div class="lg:hidden mb-6 flex flex-col sm:flex-row gap-4">

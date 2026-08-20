@@ -8,6 +8,21 @@ use Illuminate\Http\Request;
 
 class DentalChartController extends Controller
 {
+    public function print(Patient $patient)
+    {
+        if ($patient->organization_id !== auth()->user()->organization_id) {
+            abort(403);
+        }
+
+        $findings = ToothFinding::where('patient_id', $patient->id)->get();
+        $isChild = $patient->date_of_birth
+            ? \Carbon\Carbon::parse($patient->date_of_birth)->age <= 14
+            : false;
+        $treatmentCatalogs = \App\Models\TreatmentCatalog::where('organization_id', auth()->user()->organization_id)->get();
+
+        return view('patients.dental-chart-print', compact('patient', 'findings', 'isChild', 'treatmentCatalogs'));
+    }
+
     public function show(Patient $patient)
     {
         // Security: Ensure the user belongs to the same organization as the patient

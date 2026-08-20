@@ -1,20 +1,46 @@
-        <!-- ========================================== -->
-        <!--                  SCREEN VIEW                 -->
-        <!-- ========================================== -->
         <div class="print:hidden">
-            <div class="max-w-5xl mx-auto space-y-8 relative pb-24">
+            <div class="w-full space-y-8 relative pb-24">
                 
-                <!-- Main Content Area -->
                 <div class="space-y-8">
-                    <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
-                    
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                            <h3 class="text-xl font-bold text-gray-900">Dental Odontogram</h3>
-                            <div class="flex flex-wrap gap-4 text-xs font-semibold text-gray-500">
-                                <span class="flex items-center"><span class="w-3 h-3 rounded bg-[#ef4444] mr-1.5"></span> Caries</span>
-                                <span class="flex items-center"><span class="w-3 h-3 rounded bg-[#3b82f6] mr-1.5"></span> Filling</span>
-                                <span class="flex items-center"><span class="w-3 h-3 rounded bg-[#eab308] mr-1.5"></span> Crown</span>
-                                <span class="flex items-center"><span class="w-3 h-3 rounded border-2 border-[#6b7280] mr-1.5"></span> Extracted</span>
+                    <div class="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100">
+
+                        <!-- Magic Tool (inline, above chart) -->
+                        <div class="bg-gray-50 border border-gray-100 rounded-2xl p-3 mb-6">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="text-xs font-black text-gray-500 uppercase tracking-wider">Tool:</span>
+                                <button @click="activeTool = 'eraser'" :class="activeTool === 'eraser' ? 'bg-white ring-2 ring-gray-400 font-bold shadow' : 'hover:bg-white'" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-gray-700 transition-all font-medium">
+                                    <span>🧹</span> Eraser
+                                </button>
+                                <button @click="activeTool = 'decayed'" :class="activeTool === 'decayed' ? 'bg-red-50 ring-2 ring-red-400 font-bold text-red-700 shadow' : 'hover:bg-red-50'" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-gray-700 transition-all font-medium">
+                                    <span class="w-3 h-3 rounded bg-[#ef4444] inline-block"></span> Caries
+                                </button>
+                                <button @click="activeTool = 'filled'" :class="activeTool === 'filled' ? 'bg-blue-50 ring-2 ring-blue-400 font-bold text-blue-700 shadow' : 'hover:bg-blue-50'" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-gray-700 transition-all font-medium">
+                                    <span class="w-3 h-3 rounded bg-[#3b82f6] inline-block"></span> Filling
+                                </button>
+                                <button @click="activeTool = 'crown'" :class="activeTool === 'crown' ? 'bg-yellow-50 ring-2 ring-yellow-400 font-bold text-yellow-700 shadow' : 'hover:bg-yellow-50'" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-gray-700 transition-all font-medium">
+                                    <span class="w-3 h-3 rounded bg-[#eab308] inline-block"></span> Crown
+                                </button>
+                                <button @click="activeTool = 'extracted'" :class="activeTool === 'extracted' ? 'bg-gray-200 ring-2 ring-gray-500 font-bold shadow' : 'hover:bg-gray-100'" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-gray-700 transition-all font-medium">
+                                    <svg class="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> Extracted
+                                </button>
+                                <select x-model="activeTool" class="border-gray-200 rounded-xl focus:border-[#39D3C4] focus:ring-[#39D3C4] text-xs py-1.5 bg-white font-medium">
+                                    <option value="">-- Catalog --</option>
+                                    <template x-for="item in treatmentCatalogs" :key="item.id">
+                                        <option :value="'treatment_' + item.id" x-text="`${item.name} (${item.default_price} DH)`"></option>
+                                    </template>
+                                </select>
+                                <button @click="$dispatch('save-odontogram')" :disabled="isSaving" class="flex items-center gap-1.5 px-4 py-1.5 bg-[#39D3C4] text-white rounded-xl text-xs font-bold hover:bg-[#2db3a6] transition-colors disabled:opacity-50">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                                    Save
+                                </button>
+                                <button @click="generatePlan()" class="flex items-center gap-1.5 px-4 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition-colors">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                    Generate Plan
+                                </button>
+                                <button onclick="window.open('{{ route('patients.dental-chart.print', $patient) }}', '_blank')" class="flex items-center gap-1.5 px-4 py-1.5 bg-gray-100 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                    Print
+                                </button>
                             </div>
                         </div>
 
@@ -75,7 +101,6 @@
                         </div> <!-- End Adult Chart -->
 
                         <div class="w-full" x-show="isChild">
-                            <h3 class="text-xl font-bold text-gray-900 mb-8">Pediatric Chart (Child)</h3>
 
                             <!-- Child Maxillary -->
                             <div class="flex justify-center gap-1 mb-8 pb-20">
@@ -189,43 +214,4 @@
             </div>
         </div>
 
-            <!-- Floating Clinical Tools (Draggable) -->
-            <div id="clinical-tools" class="fixed top-24 right-8 bg-white/95 backdrop-blur-md p-5 rounded-3xl shadow-2xl border border-gray-100 z-40 w-72 cursor-move hidden lg:block" style="touch-action: none;">
-                <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3 cursor-move">
-                    <h4 class="text-sm font-black text-gray-900 flex items-center tracking-wide uppercase">
-                        <svg class="w-5 h-5 mr-2 text-[#39D3C4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                        Magic Tool
-                    </h4>
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
-                </div>
-                
-                <div class="space-y-2 mb-4">
-                    <button @click="activeTool = 'eraser'" :class="activeTool === 'eraser' ? 'bg-gray-100 ring-2 ring-gray-400 font-bold' : 'hover:bg-gray-50'" class="w-full flex items-center p-2.5 rounded-xl text-sm text-gray-700 transition-all font-medium">
-                        <span class="w-6 h-6 rounded bg-white border border-gray-200 flex items-center justify-center mr-3 text-xs shadow-sm">🧹</span> Eraser / Healthy
-                    </button>
-                    <button @click="activeTool = 'decayed'" :class="activeTool === 'decayed' ? 'bg-red-50 ring-2 ring-red-400 font-bold text-red-700' : 'hover:bg-red-50'" class="w-full flex items-center p-2.5 rounded-xl text-sm text-gray-700 transition-all font-medium">
-                        <span class="w-6 h-6 rounded bg-[#ef4444] mr-3 shadow-sm"></span> Caries (Decay)
-                    </button>
-                    <button @click="activeTool = 'filled'" :class="activeTool === 'filled' ? 'bg-blue-50 ring-2 ring-blue-400 font-bold text-blue-700' : 'hover:bg-blue-50'" class="w-full flex items-center p-2.5 rounded-xl text-sm text-gray-700 transition-all font-medium">
-                        <span class="w-6 h-6 rounded bg-[#3b82f6] mr-3 shadow-sm"></span> Filling (Resin)
-                    </button>
-                    <button @click="activeTool = 'crown'" :class="activeTool === 'crown' ? 'bg-yellow-50 ring-2 ring-yellow-400 font-bold text-yellow-700' : 'hover:bg-yellow-50'" class="w-full flex items-center p-2.5 rounded-xl text-sm text-gray-700 transition-all font-medium">
-                        <span class="w-6 h-6 rounded bg-[#eab308] mr-3 shadow-sm"></span> Crown
-                    </button>
-                    <button @click="activeTool = 'extracted'" :class="activeTool === 'extracted' ? 'bg-gray-100 ring-2 ring-gray-500 font-bold text-gray-800' : 'hover:bg-gray-100'" class="w-full flex items-center p-2.5 rounded-xl text-sm text-gray-700 transition-all font-medium">
-                        <span class="w-6 h-6 rounded border-2 border-[#6b7280] flex items-center justify-center mr-3 shadow-sm"><svg class="w-4 h-4 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></span> Extracted
-                    </button>
-                </div>
-                
-                <div class="border-t border-gray-100 pt-4">
-                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Or Add Treatment:</label>
-                    <select x-model="activeTool" class="w-full border-gray-200 rounded-xl shadow-sm focus:border-[#39D3C4] focus:ring-[#39D3C4] text-sm py-2.5 mb-1 bg-gray-50 font-medium">
-                        <option value="">-- Catalog --</option>
-                        <template x-for="item in treatmentCatalogs" :key="item.id">
-                            <option :value="'treatment_' + item.id" x-text="`${item.name} (${item.default_price} DH)`"></option>
-                        </template>
-                    </select>
-                    <p class="text-[10px] text-gray-400 mt-2 leading-tight text-center font-medium bg-gray-50 rounded-lg p-2">Select a tool, then click on any tooth surface.</p>
-                </div>
-            </div>
             <!-- End Screen View -->

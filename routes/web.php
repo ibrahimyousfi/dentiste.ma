@@ -11,7 +11,9 @@ use App\Http\Controllers\AppointmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    $plans = App\Models\SubscriptionPlan::where('is_active', true)->get();
+    $clinics = App\Models\Organization::whereNotNull('name')->limit(15)->get(['name', 'logo']);
+    return view('welcome', compact('plans', 'clinics'));
 });
 
 Route::get('/dashboard', function () {

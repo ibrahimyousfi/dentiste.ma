@@ -21,9 +21,9 @@ class AiCopilotController extends Controller
     {
         $org = Auth::user()->organization;
 
-        $totalPatients = Patient::count();
-        $todayAppts = Appointment::whereDate('appointment_date', today())->count();
-        $pendingAppts = Appointment::where('status', 'waiting')->count();
+        $totalPatients = Patient::where('organization_id', $org->id)->count();
+        $todayAppts = Appointment::where('organization_id', $org->id)->whereDate('appointment_date', today())->count();
+        $pendingAppts = Appointment::where('organization_id', $org->id)->where('status', 'waiting')->count();
 
         $monthlyRevenue = Payment::where('organization_id', $org->id)
             ->whereMonth('payment_date', now()->month)
@@ -32,14 +32,14 @@ class AiCopilotController extends Controller
 
         $totalRevenue = Payment::where('organization_id', $org->id)->sum('amount');
 
-        $activePlans = TreatmentPlan::where('status', 'accepted')->count();
-        $proposedPlans = TreatmentPlan::where('status', 'proposed')->count();
+        $activePlans = TreatmentPlan::where('organization_id', $org->id)->where('status', 'accepted')->count();
+        $proposedPlans = TreatmentPlan::where('organization_id', $org->id)->where('status', 'proposed')->count();
 
-        $lowStockItems = InventoryItem::where('quantity', '<=', 5)->count();
+        $lowStockItems = InventoryItem::where('organization_id', $org->id)->where('current_stock', '<=', 5)->count();
 
-        $pendingLabCases = LabCase::where('status', 'sent')->count();
+        $pendingLabCases = LabCase::where('organization_id', $org->id)->where('status', 'sent')->count();
 
-        $subscriptionPlan = $org->subscription_plan ?? 'Basic';
+        $subscriptionPlan = strtolower($org->subscription->plan->slug ?? 'basic');
 
         return <<<CONTEXT
 You are "Dental Copilot", an intelligent AI assistant embedded inside a dental clinic management system (SaaS) called Dentiste.ma.
@@ -88,14 +88,14 @@ CONTEXT;
     public function chat(Request $request)
     {
         $org = Auth::user()->organization;
-        $plan = $org->subscription_plan ?? 'Basic';
+        $plan = strtolower($org->subscription->plan->slug ?? 'basic');
 
-        // Feature gating: only Pro and Premium plans get the AI Copilot
-        if (! in_array($plan, ['Pro', 'Premium'])) {
+        // Feature gating: only Pro, Premium, and Elite plans get the AI Copilot
+        if (! in_array($plan, ['pro', 'premium', 'elite'])) {
             return response()->json([
                 'success' => false,
                 'locked' => true,
-                'message' => 'The AI Copilot is available on the **Pro** and **Premium** plans. Upgrade your subscription to unlock it.',
+                'message' => 'The AI Copilot is available on the **Pro**, **Premium**, and **Elite** plans. Upgrade your subscription to unlock it.',
             ], 403);
         }
 
@@ -130,10 +130,12 @@ CONTEXT;
         // Append the new user message
         $messages[] = ['role' => 'user', 'content' => $request->message];
 
+        $apiUrl = env('OPENAI_API_BASE', 'https://api.openai.com/v1/chat/completions');
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer '.$apiKey,
             'Content-Type' => 'application/json',
-        ])->timeout(30)->post('https://api.openai.com/v1/chat/completions', [
+        ])->timeout(30)->post($apiUrl, [
             'model' => 'gpt-4o-mini',
             'messages' => $messages,
             'temperature' => 0.5,
@@ -141,9 +143,10 @@ CONTEXT;
         ]);
 
         if (! $response->successful()) {
+            $errorMsg = $response->json('error.message') ?? 'AI service is temporarily unavailable. Please try again.';
             return response()->json([
                 'success' => false,
-                'message' => 'AI service is temporarily unavailable. Please try again.',
+                'message' => $errorMsg,
             ], 500);
         }
 
@@ -161,8 +164,8 @@ CONTEXT;
     public function status()
     {
         $org = Auth::user()->organization;
-        $plan = $org->subscription_plan ?? 'Basic';
-        $isUnlocked = in_array($plan, ['Pro', 'Premium']);
+        $plan = strtolower($org->subscription->plan->slug ?? 'basic');
+        $isUnlocked = in_array($plan, ['pro', 'premium', 'elite']);
 
         return response()->json([
             'unlocked' => $isUnlocked,

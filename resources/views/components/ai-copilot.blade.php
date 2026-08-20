@@ -1,7 +1,7 @@
 @php
     $org = Auth::user()->organization;
-    $plan = $org->subscription_plan ?? 'Basic';
-    $isUnlocked = in_array($plan, ['Pro', 'Premium']);
+    $plan = strtolower($org->subscription->plan->slug ?? 'basic');
+    $isUnlocked = in_array($plan, ['pro', 'premium', 'elite']);
     $chatRoute = route('ai-copilot.chat');
     $upgradeRoute = route('clinic.subscription');
     $userName = Auth::user()->name;

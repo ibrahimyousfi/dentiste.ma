@@ -151,10 +151,14 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex items-center gap-3 cursor-pointer">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#39D3C4] to-blue-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-[#39D3C4]/20">
-                        D
-                    </div>
-                    <span class="font-bold text-xl tracking-tight text-white">Dental<span class="text-[#39D3C4]">SaaS</span></span>
+                    @if(isset($globalPlatformLogo) && $globalPlatformLogo)
+                        <img src="{{ asset('storage/' . $globalPlatformLogo) }}" alt="{{ $globalPlatformName ?? 'Platform Logo' }}" class="h-10 w-auto object-contain">
+                    @else
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#39D3C4] to-blue-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-[#39D3C4]/20">
+                            D
+                        </div>
+                        <span class="font-bold text-xl tracking-tight text-white">{{ explode(' ', $globalPlatformName ?? 'Dental SaaS')[0] }}<span class="text-[#39D3C4]">{{ explode(' ', $globalPlatformName ?? 'Dental SaaS')[1] ?? '' }}</span></span>
+                    @endif
                 </div>
                 <div class="hidden md:flex space-x-8">
                     <a href="#features" class="text-sm font-medium text-gray-300 hover:text-white transition">Features</a>
@@ -409,13 +413,17 @@
     <footer class="border-t border-white/10 bg-black py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#39D3C4] to-blue-500 flex items-center justify-center text-white font-bold shadow-lg">
-                    D
-                </div>
-                <span class="font-bold tracking-tight text-white">Dental<span class="text-[#39D3C4]">SaaS</span></span>
+                @if(isset($globalPlatformLogo) && $globalPlatformLogo)
+                    <img src="{{ asset('storage/' . $globalPlatformLogo) }}" alt="{{ $globalPlatformName ?? 'Platform Logo' }}" class="h-8 w-auto object-contain">
+                @else
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#39D3C4] to-blue-500 flex items-center justify-center text-white font-bold shadow-lg">
+                        D
+                    </div>
+                    <span class="font-bold tracking-tight text-white">{{ explode(' ', $globalPlatformName ?? 'Dental SaaS')[0] }}<span class="text-[#39D3C4]">{{ explode(' ', $globalPlatformName ?? 'Dental SaaS')[1] ?? '' }}</span></span>
+                @endif
             </div>
             <div class="text-gray-500 text-sm">
-                &copy; {{ date('Y') }} {{ config('app.name', 'DentalSaaS') }}. All rights reserved.
+                &copy; {{ date('Y') }} {{ $globalPlatformName ?? 'Dental SaaS' }}. All rights reserved.
             </div>
             <div class="flex gap-6">
                 <a href="#" class="text-gray-400 hover:text-white transition">Privacy</a>

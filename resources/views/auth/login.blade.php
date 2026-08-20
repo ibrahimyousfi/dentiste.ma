@@ -1,4 +1,9 @@
 <x-guest-layout>
+    <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
+        <p class="text-gray-500 text-sm mt-1">Sign in to manage your clinic</p>
+    </div>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 

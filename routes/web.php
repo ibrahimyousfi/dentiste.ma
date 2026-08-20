@@ -45,6 +45,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/organizations/{organization}', [App\Http\Controllers\OrganizationController::class, 'update'])->name('organizations.update');
         Route::post('/organizations/{organization}/suspend', [App\Http\Controllers\OrganizationController::class, 'suspend'])->name('organizations.suspend');
 
+        // Registration Requests
+        Route::get('/registration-requests', [\App\Http\Controllers\Admin\RegistrationRequestController::class, 'index'])->name('registration-requests.index');
+        Route::post('/registration-requests/{request}/status', [\App\Http\Controllers\Admin\RegistrationRequestController::class, 'updateStatus'])->name('registration-requests.update-status');
+        Route::delete('/registration-requests/{request}', [\App\Http\Controllers\Admin\RegistrationRequestController::class, 'destroy'])->name('registration-requests.destroy');
+
         Route::get('/subscriptions', [\App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('subscriptions');
         Route::post('/subscriptions/{subscription}/update-plan', [\App\Http\Controllers\Admin\SubscriptionController::class, 'updatePlan'])->name('subscriptions.update-plan');
         Route::post('/subscriptions/{subscription}/extend', [\App\Http\Controllers\Admin\SubscriptionController::class, 'extend'])->name('subscriptions.extend');
@@ -52,7 +57,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/subscriptions/requests/{request}/approve', [\App\Http\Controllers\Admin\SubscriptionController::class, 'approveRequest'])->name('subscriptions.requests.approve');
         Route::post('/subscriptions/requests/{request}/reject', [\App\Http\Controllers\Admin\SubscriptionController::class, 'rejectRequest'])->name('subscriptions.requests.reject');
         Route::get('/revenue', function() { return view('admin.revenue'); })->name('revenue');
-        Route::get('/settings', function() { return view('admin.settings'); })->name('settings');
+        Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
+        Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
     });
 
     // Clinic Owner Dashboard

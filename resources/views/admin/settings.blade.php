@@ -38,24 +38,53 @@
 
         <!-- Settings Form Area -->
         <div class="flex-1 bg-[#1e293b] rounded-2xl border border-[#334155] shadow-lg overflow-hidden">
-            <div class="p-6 border-b border-[#334155]">
-                <h2 class="text-lg font-bold text-white">General Configuration</h2>
-                <p class="text-slate-400 text-sm mt-1">These settings affect the entire SaaS platform.</p>
-            </div>
-            <div class="p-6 space-y-8">
+            <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="p-6 border-b border-[#334155] flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-bold text-white">General Configuration</h2>
+                        <p class="text-slate-400 text-sm mt-1">These settings affect the entire SaaS platform.</p>
+                    </div>
+                    <button type="submit" class="bg-indigo-600 text-white px-5 py-2.5 rounded-lg shadow-lg hover:bg-indigo-500 transition font-semibold flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        Save Changes
+                    </button>
+                </div>
                 
-                <!-- Platform Name -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-2">Platform Name</label>
-                    <input type="text" value="Dental SaaS Cloud" class="w-full max-w-lg bg-[#0f172a] border border-[#334155] rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition">
-                </div>
+                @if(session('success'))
+                    <div class="p-4 bg-emerald-500/10 border-b border-emerald-500/20 text-emerald-400">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                
+                <div class="p-6 space-y-8">
+                    
+                    <!-- Platform Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Platform Name</label>
+                        <input type="text" name="platform_name" value="{{ old('platform_name', $platformName ?? 'Dental SaaS') }}" required class="w-full max-w-lg bg-[#0f172a] border border-[#334155] rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition">
+                        @error('platform_name')
+                            <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                <!-- Support Email -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-2">Support Email</label>
-                    <input type="email" value="support@dentalsaas.com" class="w-full max-w-lg bg-[#0f172a] border border-[#334155] rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition">
-                    <p class="text-xs text-slate-500 mt-2">All tenant support requests will be sent to this address.</p>
-                </div>
+                    <!-- Platform Logo -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Platform Logo</label>
+                        
+                        @if(isset($platformLogo) && $platformLogo)
+                            <div class="mb-4">
+                                <p class="text-xs text-slate-400 mb-2">Current Logo:</p>
+                                <img src="{{ asset('storage/' . $platformLogo) }}" alt="Platform Logo" class="h-16 rounded bg-white p-2">
+                            </div>
+                        @endif
+
+                        <input type="file" name="platform_logo" accept="image/*" class="w-full max-w-lg bg-[#0f172a] border border-[#334155] rounded-lg px-4 py-2.5 text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20 transition">
+                        <p class="text-xs text-slate-500 mt-2">Upload a clean logo (PNG/SVG) to be displayed on the homepage, login, and registration pages.</p>
+                        @error('platform_logo')
+                            <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
                 <!-- Maintenance Mode -->
                 <div>
@@ -100,6 +129,7 @@
                 </div>
 
             </div>
+            </form>
         </div>
     </div>
 </x-admin-layout>

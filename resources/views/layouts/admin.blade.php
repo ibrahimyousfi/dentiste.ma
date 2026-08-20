@@ -44,6 +44,17 @@
                 Clinics (Tenants)
             </a>
 
+            <a href="{{ route('admin.registration-requests.index') }}" class="sidebar-link {{ request()->routeIs('admin.registration-requests.*') ? 'active' : 'text-slate-300' }} flex items-center px-6 py-3 font-medium mt-1">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                Registration Requests
+                @php
+                    $pendingRequestsCount = \App\Models\ClinicRegistrationRequest::where('status', 'pending')->count();
+                @endphp
+                @if($pendingRequestsCount > 0)
+                    <span class="ml-auto bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ $pendingRequestsCount }}</span>
+                @endif
+            </a>
+
             <div class="px-4 mt-8 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Business</div>
 
             <a href="{{ route('admin.subscriptions') }}" class="sidebar-link {{ request()->routeIs('admin.subscriptions') ? 'active' : 'text-slate-300' }} flex items-center justify-between px-6 py-3 font-medium">

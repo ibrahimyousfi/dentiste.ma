@@ -22,6 +22,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\View::composer('*', function ($view) {
+            // Only query database if table exists to prevent migration errors
+            if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                $platformName = \App\Models\Setting::get('platform_name', config('app.name', 'Dental SaaS'));
+                $platformLogo = \App\Models\Setting::get('platform_logo');
+                
+                $view->with('globalPlatformName', $platformName);
+                $view->with('globalPlatformLogo', $platformLogo);
+            }
+        });
     }
 }

@@ -24,15 +24,15 @@ class SubscriptionController extends Controller
             $end = \Carbon\Carbon::parse($currentSubscription->ends_at);
             $now = now();
             
-            $totalDays = $start->diffInDays($end) ?: 1;
+            $totalDays = (int) ceil($start->diffInDays($end)) ?: 1;
             
             if ($now->greaterThanOrEqualTo($end)) {
                 $daysElapsed = $totalDays;
                 $daysRemaining = 0;
                 $percentage = 100;
             } else {
-                $daysElapsed = $start->diffInDays($now);
-                $daysRemaining = $now->diffInDays($end);
+                $daysElapsed = (int) floor($start->diffInDays($now));
+                $daysRemaining = (int) ceil($now->diffInDays($end));
                 $percentage = min(100, max(0, ($daysElapsed / $totalDays) * 100));
             }
         }

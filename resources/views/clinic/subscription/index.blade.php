@@ -81,6 +81,25 @@
         @endif
 
         <div class="space-y-12 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-x-8">
+            @php
+                $org = auth()->user()->organization;
+                $currency = $org->currency ?? 'USD';
+                
+                // Simple static exchange rates from USD
+                $exchangeRates = [
+                    'USD' => 1,
+                    'MAD' => 9.25,
+                    'EUR' => 0.92,
+                    'GBP' => 0.79,
+                ];
+                $rate = $exchangeRates[$currency] ?? 1;
+                $currencySymbol = match($currency) {
+                    'MAD' => 'MAD ',
+                    'EUR' => '€',
+                    'GBP' => '£',
+                    default => '$',
+                };
+            @endphp
             @foreach($plans as $plan)
                 @php
                     $isCurrent = $currentSubscription && $currentSubscription->subscription_plan_id === $plan->id;
@@ -100,7 +119,7 @@
                     <div class="mb-5">
                         <h3 class="text-2xl font-bold text-gray-900">{{ $plan->name }}</h3>
                         <div class="mt-4 flex items-baseline text-5xl font-extrabold">
-                            ${{ $plan->price_monthly }}
+                            {{ $currencySymbol }}{{ number_format($plan->price_monthly * $rate, 2) }}
                             <span class="ml-1 text-xl font-medium text-gray-500">/mo</span>
                         </div>
                     </div>

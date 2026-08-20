@@ -20,6 +20,13 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="mb-4 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl relative shadow-sm flex items-center">
+                <svg class="w-5 h-5 mr-2 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="font-medium">{{ session('error') }}</span>
+            </div>
+        @endif
+
         @if($staffMembers->isEmpty())
             <x-ui.card class="p-16 text-center">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#39D3C4]/10 mb-4 text-[#39D3C4]">

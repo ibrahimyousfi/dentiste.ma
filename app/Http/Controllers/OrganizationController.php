@@ -20,7 +20,13 @@ class OrganizationController extends Controller
             ->withSum('payments', 'amount')
             ->latest()
             ->get();
-        return view('admin.organizations.index', compact('organizations'));
+            
+        $pendingRequests = \App\Models\SubscriptionRequest::with(['organization', 'plan'])
+            ->where('status', 'pending')
+            ->latest()
+            ->get();
+            
+        return view('admin.organizations.index', compact('organizations', 'pendingRequests'));
     }
 
     /**

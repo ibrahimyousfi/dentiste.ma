@@ -19,6 +19,37 @@
                 {{ session('success') }}
             </div>
         @endif
+        
+        @if(isset($pendingRequests) && $pendingRequests->count() > 0)
+            <div class="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-xl overflow-hidden shadow-sm">
+                <div class="px-4 py-3 border-b border-amber-500/20 bg-amber-500/5 flex items-center justify-between">
+                    <div class="flex items-center text-amber-400 font-bold">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Pending Subscription Upgrades ({{ $pendingRequests->count() }})
+                    </div>
+                    <a href="{{ route('admin.subscriptions.index') }}" class="text-sm text-amber-400 hover:text-amber-300 font-medium underline">Manage All</a>
+                </div>
+                <div class="divide-y divide-amber-500/10">
+                    @foreach($pendingRequests as $req)
+                        <div class="px-4 py-3 flex items-center justify-between">
+                            <div>
+                                <span class="text-white font-semibold">{{ $req->organization->name }}</span>
+                                <span class="text-slate-400 text-sm ml-2">requested upgrade to</span>
+                                <span class="text-amber-400 font-bold ml-1">{{ $req->plan->name }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <form method="POST" action="{{ route('admin.subscriptions.approve', $req->id) }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs font-bold rounded-lg border border-emerald-500/30 transition">
+                                        Approve
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
 
         <div class="bg-[#1e293b] rounded-2xl border border-[#334155] shadow-xl overflow-hidden">
             <!-- Table Controls -->

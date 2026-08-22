@@ -25,6 +25,10 @@
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                     Overview
                 </button>
+                <button @click="tab = 'details'" :class="{ 'bg-[#39D3C4]/10 text-[#2db3a6] font-bold': tab === 'details', 'text-gray-500 hover:bg-gray-50 font-medium': tab !== 'details' }" class="px-5 py-2.5 rounded-xl text-sm transition-all whitespace-nowrap flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    Patient Details
+                </button>
                 <button @click="tab = 'medical'" :class="{ 'bg-[#39D3C4]/10 text-[#2db3a6] font-bold': tab === 'medical', 'text-gray-500 hover:bg-gray-50 font-medium': tab !== 'medical' }" class="px-5 py-2.5 rounded-xl text-sm transition-all whitespace-nowrap flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     Medical History
@@ -45,9 +49,8 @@
 
             <!-- Tab Contents -->
             <div class="space-y-6">
-                <!-- Overview Tab -->
-                <div x-show="tab === 'overview'" x-transition.opacity.duration.300ms class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
+                <!-- Patient Details Tab -->
+                <div x-show="tab === 'details'" style="display: none;" x-transition.opacity.duration.300ms class="w-full">
                     <!-- Patient Info Card (Inline Edit Form) -->
                     <form action="{{ route('patients.update', $patient) }}" method="POST"
                           class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-full hover:shadow-md transition-shadow relative overflow-hidden">
@@ -111,9 +114,12 @@
                             </div>
                         </div>
                     </form>
+                </div>
 
+                <!-- Overview Tab -->
+                <div x-show="tab === 'overview'" x-transition.opacity.duration.300ms class="w-full">
                     <!-- Dental Chart (Inline) -->
-                    <div class="lg:col-span-2"
+                    <div class="w-full"
                          x-data="odontogram()"
                          @save-odontogram.window="saveChart()"
                          @print-chart.window="printChart()">
@@ -121,19 +127,34 @@
                         @include('patients.partials.odontogram-print')
                     </div>
 
+                    @push('head_scripts')
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+                    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+                    @endpush
+
                     @push('scripts')
                     <script>
                         document.addEventListener('alpine:init', () => {
-                            Alpine.data('odontogram', () => ({
+                            Alpine.data('odontogram', () => {
+                                const threeCtx = { scene: null, camera: null, renderer: null, controls: null, teethMeshMap: {}, raycaster: null, mouse: null, animationId: null };
+                                return {
+                                viewMode: '2D', // '2D' or '3D'
                                 activeTool: 'eraser',
                                 treatmentCatalogs: @json($treatmentCatalogs),
                                 chartData: {},
                                 isSaving: false,
                                 isChild: @json($isChild),
                                 canEditChart: @json(auth()->user()->hasRole('Clinic Owner')),
+                                
+                                // 3D Engine state moved to threeCtx
+
                                 findings: @json($findings),
 
                                 init() {
+                                    // Initialise Three.js helpers (must be done after THREE is loaded)
+                                    threeCtx.raycaster = new THREE.Raycaster();
+                                    threeCtx.mouse     = new THREE.Vector2();
+
                                     const allTeeth = [
                                         18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28,
                                         48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38,
@@ -160,6 +181,289 @@
                                     }
                                     window.addEventListener('save-odontogram', () => this.saveChart());
                                     window.addEventListener('print-chart', () => this.printChart());
+
+                                    // Listen for viewMode changes to initialize 3D
+                                    this.$watch('viewMode', (value) => {
+                                        if (value === '3D') {
+                                            this.$nextTick(() => {
+                                                // Small delay so browser applies display:block before Three.js reads dimensions
+                                                setTimeout(() => {
+                                                    if (!threeCtx.scene) {
+                                                        this.init3DScene();
+                                                        this.buildArch3D();
+                                                        this.add3DEvents();
+                                                        this.animate();
+                                                    } else {
+                                                        this.update3DFromData();
+                                                        // Resize renderer in case container changed size
+                                                        const container = document.getElementById('three-canvas-container');
+                                                        if (container && container.clientWidth > 0) {
+                                                            threeCtx.camera.aspect = container.clientWidth / container.clientHeight;
+                                                            threeCtx.camera.updateProjectionMatrix();
+                                                            threeCtx.renderer.setSize(container.clientWidth, container.clientHeight);
+                                                        }
+                                                    }
+                                                }, 50);
+                                            });
+                                        }
+                                    });
+                                },
+
+                                // --- 3D ENGINE METHODS ---
+                                init3DScene() {
+                                    const container = document.getElementById('three-canvas-container');
+                                    if (!container) return;
+
+                                    const w = container.clientWidth  || container.offsetWidth  || 900;
+                                    const h = container.clientHeight || container.offsetHeight || 600;
+
+                                    threeCtx.scene = new THREE.Scene();
+                                    threeCtx.scene.background = new THREE.Color(0x0f172a); // deep navy
+                                    threeCtx.scene.fog = new THREE.Fog(0x0f172a, 20, 60);
+
+                                    threeCtx.camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 200);
+                                    threeCtx.camera.position.set(0, 18, 25);
+
+                                    threeCtx.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+                                    threeCtx.renderer.setSize(w, h);
+                                    threeCtx.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                                    threeCtx.renderer.shadowMap.enabled = true;
+                                    threeCtx.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                                    threeCtx.renderer.outputEncoding = THREE.sRGBEncoding;
+                                    threeCtx.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                                    
+                                    container.innerHTML = '';
+                                    container.appendChild(threeCtx.renderer.domElement);
+
+                                    // --- Orbit Controls ---
+                                    if (typeof THREE.OrbitControls !== 'undefined') {
+                                        threeCtx.controls = new THREE.OrbitControls(threeCtx.camera, threeCtx.renderer.domElement);
+                                        threeCtx.controls.enableDamping = true;
+                                        threeCtx.controls.dampingFactor = 0.05;
+                                        threeCtx.controls.maxPolarAngle = Math.PI / 1.8;
+                                        threeCtx.controls.minDistance = 10;
+                                        threeCtx.controls.maxDistance = 40;
+                                        threeCtx.controls.target.set(0, 0, 0);
+                                    }
+
+                                    // --- Resize ---
+                                    window.addEventListener('resize', () => {
+                                        const cw = container.clientWidth || 900;
+                                        const ch = container.clientHeight || 600;
+                                        if (cw > 0 && ch > 0) {
+                                            threeCtx.camera.aspect = cw / ch;
+                                            threeCtx.camera.updateProjectionMatrix();
+                                            threeCtx.renderer.setSize(cw, ch);
+                                        }
+                                    });
+
+                                    // --- Advanced Lighting ---
+                                    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+                                    threeCtx.scene.add(ambientLight);
+
+                                    const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+                                    mainLight.position.set(10, 20, 15);
+                                    mainLight.castShadow = true;
+                                    mainLight.shadow.mapSize.width = 2048;
+                                    mainLight.shadow.mapSize.height = 2048;
+                                    mainLight.shadow.bias = -0.001;
+                                    threeCtx.scene.add(mainLight);
+
+                                    const fillLight = new THREE.DirectionalLight(0x93c5fd, 0.6); // slight blue tint
+                                    fillLight.position.set(-10, 5, -15);
+                                    threeCtx.scene.add(fillLight);
+                                    
+                                    const pointLight = new THREE.PointLight(0xfff0dd, 0.5, 50); // warm light from below
+                                    pointLight.position.set(0, -5, 5);
+                                    threeCtx.scene.add(pointLight);
+                                },
+
+                                createProceduralTooth(type) {
+                                    const shape = new THREE.Shape();
+                                    const extrudeSettings = { 
+                                        depth: 1.5, 
+                                        bevelEnabled: true, 
+                                        bevelSegments: 5, 
+                                        steps: 2, 
+                                        bevelSize: 0.2, 
+                                        bevelThickness: 0.3 
+                                    };
+
+                                    if (type === 'incisor') {
+                                        shape.moveTo(-0.4, -0.2); shape.lineTo(0.4, -0.2); 
+                                        shape.quadraticCurveTo(0.6, 0.5, 0.5, 1.2); 
+                                        shape.quadraticCurveTo(0, 1.4, -0.5, 1.2); 
+                                        shape.quadraticCurveTo(-0.6, 0.5, -0.4, -0.2);
+                                        extrudeSettings.depth = 0.5;
+                                        extrudeSettings.bevelSize = 0.1;
+                                        extrudeSettings.bevelThickness = 0.2;
+                                    } else if (type === 'canine') {
+                                        shape.moveTo(-0.4, -0.2); shape.lineTo(0.4, -0.2); 
+                                        shape.quadraticCurveTo(0.6, 0.6, 0.5, 1.0); 
+                                        shape.lineTo(0, 1.5); 
+                                        shape.lineTo(-0.5, 1.0); 
+                                        shape.quadraticCurveTo(-0.6, 0.6, -0.4, -0.2);
+                                        extrudeSettings.depth = 0.6;
+                                        extrudeSettings.bevelSize = 0.15;
+                                    } else if (type === 'premolar') {
+                                        shape.moveTo(-0.6, -0.3); shape.lineTo(0.6, -0.3); 
+                                        shape.quadraticCurveTo(0.8, 0.4, 0.7, 0.8); 
+                                        shape.lineTo(0, 1.2); 
+                                        shape.lineTo(-0.7, 0.8); 
+                                        shape.quadraticCurveTo(-0.8, 0.4, -0.6, -0.3);
+                                        extrudeSettings.depth = 0.9;
+                                    } else { // molar
+                                        shape.moveTo(-0.8, -0.5); shape.lineTo(0.8, -0.5); 
+                                        shape.quadraticCurveTo(1.0, 0.2, 0.9, 0.6); 
+                                        shape.lineTo(0.5, 1.0); shape.lineTo(0, 0.8); 
+                                        shape.lineTo(-0.5, 1.0); shape.lineTo(-0.9, 0.6); 
+                                        shape.quadraticCurveTo(-1.0, 0.2, -0.8, -0.5);
+                                        extrudeSettings.depth = 1.2;
+                                    }
+
+                                    const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                                    geo.center(); 
+                                    geo.computeVertexNormals();
+                                    return geo;
+                                },
+
+                                buildArch3D() {
+                                    // Gum base
+                                    const gumMat = new THREE.MeshStandardMaterial({ 
+                                        color: 0xcc7a75, 
+                                        roughness: 0.4,
+                                        metalness: 0.1
+                                    });
+
+                                    // Upper arch gum
+                                    const upperGumGeo = new THREE.TorusGeometry(7, 1.2, 16, 100, Math.PI);
+                                    const upperGum = new THREE.Mesh(upperGumGeo, gumMat);
+                                    upperGum.rotation.x = Math.PI / 2;
+                                    upperGum.position.set(0, 1.5, 0);
+                                    upperGum.receiveShadow = true;
+                                    threeCtx.scene.add(upperGum);
+
+                                    // Lower arch gum
+                                    const lowerGum = new THREE.Mesh(upperGumGeo, gumMat.clone());
+                                    lowerGum.rotation.x = Math.PI / 2;
+                                    lowerGum.rotation.z = Math.PI;
+                                    lowerGum.position.set(0, -1.5, 0);
+                                    lowerGum.receiveShadow = true;
+                                    threeCtx.scene.add(lowerGum);
+
+                                    // Highly realistic tooth material using PhysicalMaterial
+                                    const toothMat = new THREE.MeshPhysicalMaterial({
+                                        color: 0xffffff,
+                                        roughness: 0.15,
+                                        metalness: 0.05,
+                                        clearcoat: 0.8,
+                                        clearcoatRoughness: 0.1,
+                                        transmission: 0.1, // slightly translucent
+                                        thickness: 1.0, // for volume
+                                    });
+
+                                    const toothTypes = ['incisor','incisor','canine','premolar','premolar','molar','molar','molar'];
+                                    const quadrants = [
+                                        { start: 11, dir: 1,  y:  2.3, sign: -1 }, // upper-right
+                                        { start: 21, dir: 1,  y:  2.3, sign:  1 }, // upper-left
+                                        { start: 41, dir: 1,  y: -2.3, sign: -1 }, // lower-right
+                                        { start: 31, dir: 1,  y: -2.3, sign:  1 }, // lower-left
+                                    ];
+
+                                    quadrants.forEach(q => {
+                                        for (let i = 0; i < 8; i++) {
+                                            const toothNum = q.start + i;
+                                            const type = toothTypes[i];
+
+                                            const angle = (i / 8) * (Math.PI / 2) + 0.05;
+                                            const archRadius = 5.5 + i * 0.35; 
+                                            const x = q.sign * Math.sin(angle) * archRadius;
+                                            const z = -Math.cos(angle) * archRadius + 3;
+
+                                            const geo  = this.createProceduralTooth(type);
+                                            const mat  = toothMat.clone();
+                                            const mesh = new THREE.Mesh(geo, mat);
+
+                                            mesh.position.set(x, q.y, z);
+                                            
+                                            // Adjust rotation so teeth face outward nicely
+                                            mesh.rotation.y = q.sign * angle;
+                                            // Tilt tooth outward/inward
+                                            if (q.y > 0) mesh.rotation.x = Math.PI; // flip upper teeth
+                                            mesh.rotation.z = q.sign * angle * 0.1;
+                                            
+                                            mesh.castShadow = true;
+                                            mesh.receiveShadow = true;
+                                            mesh.userData = { toothNumber: toothNum };
+
+                                            threeCtx.scene.add(mesh);
+                                            threeCtx.teethMeshMap[toothNum] = mesh;
+                                        }
+                                    });
+
+                                    this.update3DFromData();
+                                },
+
+                                update3DFromData() {
+                                    Object.keys(threeCtx.teethMeshMap).forEach(num => {
+                                        const mesh = threeCtx.teethMeshMap[num];
+                                        const data = this.chartData[num];
+                                        if (!data) return;
+
+                                        if (data.status === 'extracted') {
+                                            mesh.visible = false;
+                                        } else {
+                                            mesh.visible = true;
+                                            // Reset to realistic ivory white
+                                            mesh.material.color.setHex(0xfcf8f2);
+                                            mesh.material.emissive.setHex(0x000000);
+                                            mesh.material.metalness = 0.05;
+                                            mesh.material.roughness = 0.15;
+
+                                            const hasDecay = Object.values(data.surfaces).includes('decayed') || data.status === 'decayed';
+                                            const hasFill  = Object.values(data.surfaces).includes('filled')  || data.status === 'filled';
+                                            const hasCrown = data.status === 'crown';
+
+                                            if (hasCrown) {
+                                                mesh.material.color.setHex(0xffd700); // Gold
+                                                mesh.material.metalness = 1.0;
+                                                mesh.material.roughness = 0.2;
+                                            }
+                                            else if (hasDecay) mesh.material.color.setHex(0x5c4033); // Dark brown/black for decay
+                                            else if (hasFill)  mesh.material.color.setHex(0xa0aab5); // Silver/Amalgam fill
+                                        }
+                                    });
+                                },
+
+                                add3DEvents() {
+                                    // Click-to-apply raycasting on the renderer canvas
+                                    const canvas = threeCtx.renderer.domElement;
+                                    canvas.addEventListener('click', (event) => {
+                                        if (!this.canEditChart || !this.activeTool || this.activeTool === 'eraser') return;
+                                        const rect = canvas.getBoundingClientRect();
+                                        const mx = ((event.clientX - rect.left) / rect.width)  * 2 - 1;
+                                        const my = -((event.clientY - rect.top)  / rect.height) * 2 + 1;
+                                        threeCtx.mouse.set(mx, my);
+                                        threeCtx.raycaster.setFromCamera(threeCtx.mouse, threeCtx.camera);
+                                        const intersects = threeCtx.raycaster.intersectObjects(Object.values(threeCtx.teethMeshMap));
+                                        if (intersects.length > 0) {
+                                            const num = intersects[0].object.userData.toothNumber;
+                                            this.applyTool(num, 'C');
+                                            
+                                            // Visual feedback on click
+                                            intersects[0].object.material.emissive.setHex(0x39D3C4);
+                                            setTimeout(() => this.update3DFromData(), 200);
+                                            this.update3DFromData();
+                                        }
+                                    });
+                                },
+
+                                animate() {
+                                    threeCtx.animationId = requestAnimationFrame(() => this.animate());
+                                    if (threeCtx.controls) threeCtx.controls.update();
+                                    if (threeCtx.renderer && threeCtx.scene && threeCtx.camera) {
+                                        threeCtx.renderer.render(threeCtx.scene, threeCtx.camera);
+                                    }
                                 },
 
                                 applyTool(tooth, surface = null) {
@@ -355,9 +659,10 @@
                                     if (isUpper) y = -y;
                                     let originY = isUpper ? -30 : 30; y += originY;
                                     return `position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) translate(${x}px, ${y}px);`;
-                                },
-                            }));
+                                }
+                            };
                         });
+                    });
                     </script>
                     @endpush
                 </div>
@@ -929,3 +1234,4 @@
     </script>
     @endpush
 </x-app-layout>
+

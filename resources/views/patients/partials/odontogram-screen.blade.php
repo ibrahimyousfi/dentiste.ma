@@ -7,7 +7,15 @@
                         <!-- Magic Tool (inline, above chart) -->
                         <div class="bg-gray-50 border border-gray-100 rounded-2xl p-3 mb-6">
                             <div class="flex flex-wrap items-center gap-2">
-                                <span class="text-xs font-black text-gray-500 uppercase tracking-wider">Tool:</span>
+                                <span class="text-xs font-black text-gray-500 uppercase tracking-wider mr-2">View:</span>
+                                <button @click="viewMode = '2D'" :class="viewMode === '2D' ? 'bg-white ring-2 ring-[#39D3C4] font-bold shadow text-[#39D3C4]' : 'hover:bg-white text-gray-600'" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all font-medium">
+                                    2D Chart
+                                </button>
+                                <button @click="viewMode = '3D'" :class="viewMode === '3D' ? 'bg-white ring-2 ring-[#39D3C4] font-bold shadow text-[#39D3C4]' : 'hover:bg-white text-gray-600'" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all font-medium mr-4">
+                                    3D Realistic
+                                </button>
+
+                                <span class="text-xs font-black text-gray-500 uppercase tracking-wider border-l border-gray-300 pl-4 ml-2">Tool:</span>
                                 <button @click="activeTool = 'eraser'" :class="activeTool === 'eraser' ? 'bg-white ring-2 ring-gray-400 font-bold shadow' : 'hover:bg-white'" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-gray-700 transition-all font-medium">
                                     <span>🧹</span> Eraser
                                 </button>
@@ -44,7 +52,26 @@
                             </div>
                         </div>
 
-                        <div class="w-full" x-show="!isChild">
+                        <!-- 3D Realistic View – always in DOM so Three.js reads real dimensions -->
+                        <div :style="viewMode === '3D' ? 'display:block' : 'display:none'" class="w-full relative rounded-2xl overflow-hidden border border-gray-100" style="height: 600px;">
+                            <div id="three-canvas-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+                            <!-- Loading overlay -->
+                            <div x-show="viewMode === '3D' && !scene" class="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                                <div class="text-center">
+                                    <svg class="animate-spin h-8 w-8 text-[#39D3C4] mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                                    <p class="text-sm text-gray-500 font-medium">Loading 3D view…</p>
+                                </div>
+                            </div>
+
+                            <!-- 3D Controls Hint -->
+                            <div class="absolute bottom-4 left-4 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl text-xs text-gray-600 font-medium shadow-sm border border-gray-100 pointer-events-none">
+                                <span class="font-bold text-gray-800">Tip:</span> Drag to rotate · Scroll to zoom · Right-drag to pan
+                            </div>
+                        </div>
+
+                        <!-- 2D SVG View -->
+                        <div class="w-full" x-show="viewMode === '2D' && !isChild">
                             <!-- Adult Maxillary (Upper) -->
                             <div class="mb-2 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Upper Arch (Maxillary)</div>
                             <div class="flex justify-center gap-1 mb-8 pb-32">
@@ -100,7 +127,7 @@
                             </div>
                         </div> <!-- End Adult Chart -->
 
-                        <div class="w-full" x-show="isChild">
+                        <div class="w-full" x-show="viewMode === '2D' && isChild">
 
                             <!-- Child Maxillary -->
                             <div class="flex justify-center gap-1 mb-8 pb-20">
@@ -153,8 +180,8 @@
                                     </template>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </div> <!-- End Child Chart -->
+                    </div> <!-- End 2D/3D Container (Implicit end) -->
                 </div>
 
                 <!-- Treatment Estimate Table -->

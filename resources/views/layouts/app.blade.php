@@ -28,6 +28,7 @@
             .border-primary { border-color: var(--color-primary); }
             .hover\:bg-primary-hover:hover { background-color: var(--color-primary-hover); }
         </style>
+        @stack('head_scripts')
     </head>
     <body class="font-sans antialiased text-gray-800 bg-[#F9FAFB]">
         <div class="flex h-screen overflow-hidden bg-[#F9FAFB] selection:bg-[#39D3C4] selection:text-white">
